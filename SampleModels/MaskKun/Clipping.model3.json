@@ -1,0 +1,9 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Masking.moc3",
+		"Textures": [
+			"Masking.1024/texture_00.png"
+		]
+	}
+}
