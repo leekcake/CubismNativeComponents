@@ -43,9 +43,17 @@ set(CSM_LIBS "")
 # PLATFORM DETECTION #
 # ------------------ #
 
-if (APPLE)
+# Detect emscripten.
+if (EMSCRIPTEN)
+
+
+# Detect macOS.
+elseif (APPLE AND NOT IOS)
   set(MACOS ON)
-elseif (NOT WIN32 AND UNIX)
+
+
+# Detect Linux.
+elseif (NOT WIN32 AND NOT ANDROID AND UNIX)
   set(LINUX ON)
 endif ()
 
@@ -103,7 +111,7 @@ endif ()
 if (_CSM_BUILD_OPENGL)
 
   # Use OpenGLES 2.0 on mobile...
-  if (ANDROID OR IOS)
+  if (ANDROID OR EMSCRIPTEN OR IOS)
     set(_CSM_USE_GLES20 ON)
 
 
@@ -211,8 +219,10 @@ if (_CSM_BUILD_RENDERING)
     endif ()
 
 
-    # ... and to allow linking to OpenGL on non-Windows platforms.
-    if (NOT WIN32)
+    # ... and to allow linking to OpenGL library.
+    if (_CSM_USE_GLES20)
+      list(APPEND CSM_LIBS "GLESv2")
+    elseif (NOT WIN32)
       find_package(OpenGL REQUIRED)
 
 
@@ -329,7 +339,13 @@ if (_CSM_BUILD_SAMPLES)
   endif ()
 
 
-  if (WIN64)
+  if (ANDROID AND (ANDROID_ABI STREQUAL "armeabi-v7a"))
+    set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/android/armeabi-v7a)
+  elseif (ANDROID AND (ANDROID_ABI STREQUAL "x86"))
+    set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/android/x86)
+  elseif (IOS)
+    set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/ios)
+  elseif (WIN64)
     set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/windows/x86_64)
   elseif (WIN32)
     set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/windows/x86)
