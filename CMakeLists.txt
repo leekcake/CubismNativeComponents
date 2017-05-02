@@ -39,6 +39,17 @@ set(CSM_INCLUDE_DIRS "")
 set(CSM_LIBS "")
 
 
+# ------------------ #
+# PLATFORM DETECTION #
+# ------------------ #
+
+if (APPLE)
+  set(MACOS ON)
+elseif (NOT WIN32 AND UNIX)
+  set(LINUX ON)
+endif ()
+
+
 # ---------------- #
 # INTERNAL OPTIONS #
 # ---------------- #
@@ -115,12 +126,6 @@ endif ()
 # Enable samples if requested.
 if (CSM_BUILD_SAMPLES)
   set(_CSM_BUILD_SAMPLES ON)
-
-
-  # TODO  Add support for more platforms.
-  if (NOT APPLE AND NOT WIN32)
-    message(FATAL_ERROR "Samples can currently only by built for macOS and Windows.")
-  endif ()
 endif ()
 
 
@@ -328,8 +333,12 @@ if (_CSM_BUILD_SAMPLES)
     set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/windows/x86_64)
   elseif (WIN32)
     set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/windows/x86)
-  elseif (APPLE)
+  elseif (MACOS)
     set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/macos)
+  elseif (LINUX AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
+    set(_CSM_CORE_LIB_DIR ${_CSM_CORE_LIB_DIR}/linux/x86_64)
+  else ()
+    message(FATAL_ERROR "Building samples for target platform not supported.")
   endif ()
 
 
