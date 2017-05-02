@@ -19,6 +19,7 @@
 #include <glad/glad.h>
 #elif _CSM_INCLUDE_GLES20
 #include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 #endif
 
 
@@ -111,6 +112,12 @@ void UpdateSortableDrawables(SortableDrawable* drawables, const csmModel* model)
 /// @return 'GL_TRUE' on success; 'GL_FALSE' otherwise.
 GLboolean LoadGl();
 
+/// Loads an OpenGL extension function.
+/// CURRENTLY ONLY WORKS FOR OPENGLES 2 ON UNIX-LIKE SYSTEMS.
+///
+/// @return Valid pointer to symbol on success; '0' otherwise.
+void* LoadGlExtension(const char* symbol);
+
 
 // ---------- //
 // GL BUFFERS //
@@ -132,7 +139,7 @@ void MakeDynamicGlBufferInPlace(GlBuffer* buffer, const GLenum type, const GLsiz
 
 // Frees GL buffer resources.
 //
-// @param[in]  buffer  Buffer to release.
+// @param  buffer  Buffer to release.
 void ReleaseGlBuffer(GlBuffer* buffer);
 
 
@@ -159,6 +166,32 @@ void* MapGlBufferForWrite(GlBuffer* buffer);
 ///
 /// @param  buffer  Buffer to unmap.
 void UnmapGlBuffer(GlBuffer* buffer);
+
+
+// ---------------- //
+// GL VERTEX ARRAYS //
+// ---------------- //
+
+/// Creates an unitialized vertex array.
+///
+/// @param  array  Array to initialize.
+void MakeGlVertexArrayInPlace(GLuint* array);
+
+/// Frees OpenGL resources.
+///
+/// @param  array  Array to release.
+void ReleaseGlVertexArray(GLuint* array);
+
+
+/// Binds a vertex array.
+///
+/// @param  array  Vertex array to bind.
+void BindGlVertexArray(const GLuint* array);
+
+/// Unbinds a vertex array. (Actually unbinds any vertex arrays)...
+/// 
+/// @param  array  Array to unbind.
+void UnbindGlVertexArray(const GLuint* array);
 
 
 // ----------- //

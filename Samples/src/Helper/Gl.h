@@ -14,5 +14,5 @@
 #if _CSM_INCLUDE_GLAD
 #include <glad/glad.h>
 #elif _CSM_INCLUDE_GLES20
-#include <GLES2/gl.h>
+#include <GLES2/gl2.h>
 #endif

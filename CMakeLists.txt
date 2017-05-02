@@ -209,7 +209,8 @@ if (_CSM_BUILD_RENDERING)
       ${_CSM_RENDERING_SOURCE_DIR}/GlMaskbuffer.c
       ${_CSM_RENDERING_SOURCE_DIR}/GlProgram.c
       ${_CSM_RENDERING_SOURCE_DIR}/GlRenderer.c
-      ${_CSM_RENDERING_SOURCE_DIR}/GlVersion.c)
+      ${_CSM_RENDERING_SOURCE_DIR}/GlVersion.c
+      ${_CSM_RENDERING_SOURCE_DIR}/GlVertexArray.c)
 
 
     # Make sure to include glad on desktop...

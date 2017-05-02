@@ -16,6 +16,58 @@
 #include <Live2DCubismRenderingInternal.h>
 
 
+// --------------------- //
+// OPENGLES 2 EXTENSIONS //
+// --------------------- //
+
+#if _CSM_USE_GLES20
+
+/// Matches 'GL_WRITE_ONLY_OES'.
+static const GLenum GL_WRITE_ONLY = 0x88B9;
+
+
+/// Wraps 'glMapBuffer'.
+///
+/// @param  target  Target type to map.
+/// @param  access  Access type.
+///
+/// @return  Valid pointer to mapped buffer on success; '0' otherwise.
+static void* glMapBuffer(GLenum target, GLenum access)
+{
+  static PFNGLMAPBUFFEROESPROC proc = 0;
+
+
+  if (!proc)
+  {
+    proc = LoadGlExtension("glMapBufferOES");
+  }
+
+
+  return proc(target, access);
+}
+
+/// Wraps 'glUnmapBuffer'.
+///
+/// @param  target  Target type to unmap.
+///
+/// @return 'GL_TRUE' unless the data store contents have become corrupt during the time the data store was mapped.
+static GLboolean glUnmapBuffer(GLenum target)
+{
+  static PFNGLUNMAPBUFFEROESPROC proc = 0;
+
+
+  if (!proc)
+  {
+    proc = LoadGlExtension("glUnmapBufferOES");
+  }
+
+
+  return proc(target);
+}
+
+#endif
+
+
 // -------------- //
 // IMPLEMENTATION //
 // -------------- //

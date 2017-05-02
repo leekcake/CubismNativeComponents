@@ -243,7 +243,7 @@ void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* 
 
 
   // Bind geometry.
-  glBindVertexArray(renderer->VertexArray);
+  BindGlVertexArray(&renderer->VertexArray);
 
 
   // Draw.
@@ -270,4 +270,8 @@ void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* 
                    GL_UNSIGNED_SHORT,
                    csmGetRenderDrawableGlIndicesOffset(renderDrawable));
   }
+
+
+  // Unbind geometry.
+  UnbindGlVertexArray(&renderer->VertexArray);
 }

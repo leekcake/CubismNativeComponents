@@ -88,8 +88,8 @@ static void InitializeBuffersAndVertexArray(csmGlRenderer* renderer,
 
 
   // Create and initialize vertex array.
-  glGenVertexArrays(1, &renderer->VertexArray);
-  glBindVertexArray(renderer->VertexArray);
+  MakeGlVertexArrayInPlace(&renderer->VertexArray);
+  BindGlVertexArray(&renderer->VertexArray);
 
 
   BindGlBuffer(&renderer->Buffers.Positions);
@@ -108,7 +108,7 @@ static void InitializeBuffersAndVertexArray(csmGlRenderer* renderer,
 
 
   // Unbind resources.
-  glBindVertexArray(0);
+  UnbindGlVertexArray(&renderer->VertexArray);
   UnbindGlBuffer(&renderer->Buffers.Uvs);
   UnbindGlBuffer(&renderer->Buffers.Indices);
 
@@ -225,7 +225,7 @@ csmGlRenderer* csmMakeBareboneGlRendererInPlace(csmModel* model,
 void csmReleaseGlRenderer(csmGlRenderer* renderer)
 {
 	// Release GL resources.
-	glDeleteVertexArrays(1, &renderer->VertexArray);
+	ReleaseGlVertexArray(&renderer->VertexArray);
 	ReleaseGlBuffer(&renderer->Buffers.Indices);
 	ReleaseGlBuffer(&renderer->Buffers.Uvs);
 	ReleaseGlBuffer(&renderer->Buffers.Positions);

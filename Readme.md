@@ -3,8 +3,8 @@
 Welcome to the open components of the Cubism SDK For Native Development.
 While the Cubism Core, which you can obtain from [here](https://live2d.github.io),
 is feature-complete in regard to Cubism 3.0 features and well tested (it actually powers the SDK For Unity),
-**the open components are work-in-progress in progress**.
-They're not yet feature-complete and their API isn't fixed yet (and the samples are only tested on macOS and Windows).
+**the open components are work-in-progress**.
+They're not yet feature-complete and their API isn't fixed yet (and the samples are only tested on Linux, macOS and Windows).
 
 If you're interested in why we're releasing the SDK anyway as early access, read on.
 
@@ -59,7 +59,10 @@ that takes care of preparing and syncing vertices and indices with the GPU, whil
 #### Dependencies
 
 The implementation depends on the C standard library, the Cubism Core library; OpenGL rendering functionality on OpenGL.
-On mobile OpenGLES 2.0 is used; on desktop OpenGL functions are loaded using [glad](https://github.com/Dav1dde/glad).
+On desktop OpenGL functions are loaded using [glad](https://github.com/Dav1dde/glad);
+on mobile OpenGLES 2.0 is used (including the extensions
+[OES_mapbuffer](https://www.khronos.org/registry/OpenGL/extensions/OES/OES_mapbuffer.txt) and
+[OES_vertex_array_object](https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt)).
 
 
 ## Samples
@@ -72,16 +75,17 @@ The project includes 2 samples to get you started:
 
 #### Dependencies
 
-The samples depend on the C standard library, the Cubism Core, [SDL2](https://www.libsdl.org), [stb](https://github.com/nothings/stb), and [glad](https://github.com/Dav1dde/glad).
+The samples depend on the C standard library, the Cubism Core, [SDL2](https://www.libsdl.org),
+[stb](https://github.com/nothings/stb), and [glad](https://github.com/Dav1dde/glad).
 
-Excpect SDL2, vendor dependencies are automatically downloaded on first build.
+Except SDL2, vendor dependencies are automatically downloaded on first build.
 
 
 #### Building
 
 1. Download the Cubism Core from [here](live2d.github.io) and put the deflated files into the root directory of this project.
 1. Download [SDL 2.0.5 source code](https://www.libsdl.org/download-2.0.php) and put deflated folder into `./Samples/vendor`.
-1. Generate make or project files for macOS or Windows using [CMake](https://cmake.org/runningcmake/).
+1. Generate make or project files for Linux, macOS or Windows using [CMake](https://cmake.org/runningcmake/).
 1. Build the samples and run them from the build directory.
 
 
@@ -100,7 +104,7 @@ Excpect SDL2, vendor dependencies are automatically downloaded on first build.
 // 3. read moc file into buffer.
 
 
-// 4. Restore moc in place.
+// 4. Restore moc in place. The 'mocBuffer' pointer will be returned on success.
 csmMoc* moc = csmReviveMocInPlace(mocBuffer, mocSize);
 
 
@@ -111,8 +115,11 @@ const unsigned int modelSize = csmGetSizeofModel(moc);
 // 6. Allocate buffer for model with adequate size and aligned to 'csmAlignofModel', then...
 
 
-// 7. Instantiate model in place.
+// 7. Instantiate model in place. The 'modelBuffer' pointer will be returned on success.
 csmModel* model = csmInitializeModelInPlace(moc, modelBuffer, modelSize);
+
+
+// As you are the owner of both moc and model memory, you can free both whenever you want.
 ```
 
 For more snippets-like code, check out `./Samples/SampleModel.c`. 
