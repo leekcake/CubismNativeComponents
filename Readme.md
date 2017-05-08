@@ -80,6 +80,9 @@ The samples depend on the C standard library, the Cubism Core, [SDL2](https://ww
 
 Except SDL2, vendor dependencies are automatically downloaded on first build.
 
+Project files and makefiles can be generated with the [CMake project](https://github.com/Live2D/CubismNativeComponents/blob/early-access/CMakeLists.txt) included.
+Make sure to have CMake 3.6+ and git available prior generating using the CMake project.
+
 
 #### Building
 
@@ -122,7 +125,7 @@ csmModel* model = csmInitializeModelInPlace(moc, modelBuffer, modelSize);
 // As you are the owner of both moc and model memory, you can free both whenever you want.
 ```
 
-For more snippets-like code, check out `./Samples/SampleModel.c`. 
+For more snippets-like code, check out `./Samples/src/SampleModel.c`. 
 
 
 ## Contributing
