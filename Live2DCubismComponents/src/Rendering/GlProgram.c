@@ -47,36 +47,34 @@ Program;
 // SHADER CODE PARTS //
 // ----------------- //
 
-/// TODO  Document!
-static const GLchar Gl33VertexShaderGlobals[] =
-"#version 330\n"
+
+/// Fragment shader precision macro.
+#if _CSM_USE_GLES20
+  #define PRECISION " mediump "
+#else
+  #define PRECISION " "
+#endif
 
 
-"in vec2 VertexPosition;"
-"in vec2 VertexUv;"
+/// Vertex shader code.
+static const GLchar VertexShaderCode[] =
 
 
-"out vec4 Color;"
-"out vec2 MaskUv;"
-"out vec2 DiffuseUv;";
-
-/// TODO  Document!
-static const GLchar Gles20VertexShaderGlobals[] =
-"attribute vec2 VertexPosition;"
-"attribute vec2 VertexUv;"
+// Global variables of vertex shader.
+"attribute vec2 VertexPosition;"    // [in] Position of vertex.
+"attribute vec2 VertexUv;"          // [in] UV address of vertex.
 
 
-"varying vec4 Color;"
-"varying vec2 MaskUv;"
-"varying vec2 DiffuseUv;";
+"varying vec4 Color;"               // [out] Color of opacity.
+"varying vec2 MaskUv;"              // [out] UV address of mask texture.
+"varying vec2 DiffuseUv;"           // [out] UV address of diffuse texture.
 
-/// TODO  Document!
-static const GLchar CommonVertexShaderGlobals[] =
-"uniform mat4 Mvp;"
-"uniform float Opacity;";
 
-/// TODO  Document!
-static const GLchar CommonVertexShaderMain[] =
+"uniform mat4 Mvp;"                 // [const] Model-View-Projection matrix.
+"uniform float Opacity;"            // [const] Opacity of part.
+
+
+// Main part of vertex shader.
 "void main()"
 "{"
 "  vec4 position = Mvp * vec4(VertexPosition, 0.0, 1.0);"
@@ -98,47 +96,24 @@ static const GLchar CommonVertexShaderMain[] =
 "}";
 
 
-/// TODO  Document!
-static const GLchar Gl33FragmentShaderGlobals[] =
-"#version 330\n"
+// Non-masked fragment shader code.
+static const GLchar NonMaskedFragmentShaderCode[] =
 
 
-"in vec4 Color;"
-"in vec2 MaskUv;"
-"in vec2 DiffuseUv;"
+// Global variables of fragment shader.
+"varying" PRECISION "vec4 Color;"                       // [in] Color of opacity.
+"varying" PRECISION "vec2 MaskUv;"                      // [in] UV address of mask texture.
+"varying" PRECISION "vec2 DiffuseUv;"                   // [in] UV address of diffuse texture.
 
 
-"out vec4 FragColor;";
+"uniform sampler2D MaskTexture;"                        // [const] Mask texture.
+"uniform sampler2D DiffuseTexture;"                     // [const] Diffuse texture.
 
-/// TODO  Document!
-static const GLchar Gles20FragmentShaderGlobals[] =
-"varying vec4 Color;"
-"varying vec2 MaskUv;"
-"varying vec2 DiffuseUv;";
 
-/// TODO  Document!
-static const GLchar CommonFragmentShaderGlobals[] =
-"uniform sampler2D MaskTexture;"
-"uniform sampler2D DiffuseTexture;";
-
-/// TODO  Document!
-static const GLchar Gl33NonMaskedFragmentShaderMain[] =
+// Main part of fragment shader.
 "void main()"
 "{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
-
-
-"  fragColor.rbg *= fragColor.a;"
-
-
-"  FragColor = fragColor;"
-"}";
-
-/// TODO  Document!
-static const GLchar Gles20NonMaskedFragmentShaderMain[] =
-"void main()"
-"{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
+"  " PRECISION "vec4 fragColor = texture2D(DiffuseTexture, DiffuseUv) * Color;"
 
 
 "  fragColor.rbg *= fragColor.a;"
@@ -147,26 +122,27 @@ static const GLchar Gles20NonMaskedFragmentShaderMain[] =
 "  gl_FragColor = fragColor;"
 "}";
 
-/// TODO  Document!
-static const GLchar Gl33MaskedFragmentShaderMain[] =
+
+
+// Masked fragment shader code.
+static const GLchar MaskedFragmentShaderCode[] =
+
+
+// Global variables of fragment shader.
+"varying" PRECISION "vec4 Color;"                       // [in] Color of opacity.
+"varying" PRECISION "vec2 MaskUv;"                      // [in] UV address of mask texture.
+"varying" PRECISION "vec2 DiffuseUv;"                   // [in] UV address of diffuse texture.
+
+
+"uniform sampler2D MaskTexture;"                        // [const] Mask texture.
+"uniform sampler2D DiffuseTexture;"                     // [const] Diffuse texture.
+
+
+// Main part of fragment shader.
 "void main()"
 "{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
-"  float maskValue = texture(MaskTexture, MaskUv).a;"
-
-
-"  fragColor.rbg *= fragColor.a;"
-
-
-"  FragColor = fragColor * maskValue;"
-"}";
-
-/// TODO  Document!
-static const GLchar Gles20MaskedFragmentShaderMain[] =
-"void main()"
-"{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
-"  float maskValue = texture(MaskTexture, MaskUv).a;"
+"  " PRECISION "vec4 fragColor = texture2D(DiffuseTexture, DiffuseUv) * Color;"
+"  " PRECISION "float maskValue = texture2D(MaskTexture, MaskUv).a;"
 
 
 "  fragColor.rbg *= fragColor.a;"
@@ -189,57 +165,56 @@ static const GLint VertexUvLocation = 1;
 
 /// Creates a program.
 ///
-/// @param  vertexShaderStrings        Vertex shader code.
-/// @param  vertexShaderStringCount    Number of strings making up vertex shader.
-/// @param  fragmentShaderStrings      Fragment shader code.
-/// @param  fragmentShaderStringCount  Number of strings making up fragment shader.
+/// @param  vertexShaderString        Vertex shader code.
+/// @param  fragmentShaderString      Fragment shader code.
 ///
 /// @return  Program.
-static Program MakeProgram(const GLchar** vertexShaderStrings,
-                           const GLsizei vertexShaderStringCount,
-                           const GLchar** fragmentShaderStrings,
-                           const GLsizei fragmentShaderStringCount)
+static Program MakeProgram(const GLchar* vertexShaderString, const GLchar* fragmentShaderString)
 {
-	GLuint vertexShader, fragmentShader;
+  GLuint vertexShader, fragmentShader;
   Program program;
 
 
-	// Make vertex shader.
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  // Make vertex shader.
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
 
-	glShaderSource(vertexShader, vertexShaderStringCount, vertexShaderStrings, 0);
-	glCompileShader(vertexShader);
+  glShaderSource(vertexShader, 1, &vertexShaderString, 0);
+  glCompileShader(vertexShader);
 
 
-	// Make fragment shader.
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  // Make fragment shader.
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 
-	glShaderSource(fragmentShader, fragmentShaderStringCount, fragmentShaderStrings, 0);
-	glCompileShader(fragmentShader);
+  glShaderSource(fragmentShader, 1, &fragmentShaderString, 0);
+  glCompileShader(fragmentShader);
 
 
-	// Create program and attach shaders.
-	program.Handle = glCreateProgram();
+  // Create program and attach shaders.
+  program.Handle = glCreateProgram();
 
 
-	glAttachShader(program.Handle, vertexShader);
-	glAttachShader(program.Handle, fragmentShader);
+  glAttachShader(program.Handle, vertexShader);
+  glAttachShader(program.Handle, fragmentShader);
 
 
-	// Bind vertex attribute locations.
-	glBindAttribLocation(program.Handle, VertexPositionLocation, "VertexPosition");
-	glBindAttribLocation(program.Handle, VertexUvLocation, "VertexUv");
+  // Bind vertex attribute locations.
+  glBindAttribLocation(program.Handle, VertexPositionLocation, "VertexPosition");
+  glBindAttribLocation(program.Handle, VertexUvLocation, "VertexUv");
 
 
-	// Link program.
-	glLinkProgram(program.Handle);
+  // Link program.
+  glLinkProgram(program.Handle);
 
 
-	// Clean up shaders.
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+  // Clean up shaders.
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+
+
+  // Use program.
+  glUseProgram(program.Handle);
 
 
   // Initialize locations.
@@ -249,7 +224,7 @@ static Program MakeProgram(const GLchar** vertexShaderStrings,
   program.Locations.DiffuseTexture = glGetUniformLocation(program.Handle, "DiffuseTexture");
 
 
-	return program;
+  return program;
 }
 
 /// Releases OpenGL resources of a program.
@@ -264,50 +239,6 @@ static void ReleaseProgram(Program* program)
 // --------- //
 // VARIABLES //
 // --------- //
-
-/// Vertex shader code.
-static const GLchar* CommonVertexShaderCode[] =
-{
-#if _CSM_USE_GL33
-  Gl33VertexShaderGlobals,
-#elif _CSM_USE_GLES20
-  Gles20VertexShaderGlobals,
-#endif
-  CommonVertexShaderGlobals,
-  CommonVertexShaderMain
-};
-
-/// Non-masked fragment shader code.
-static const GLchar* NonMaskedFragmentShaderCode[] =
-{
-#if _CSM_USE_GL33
-  Gl33FragmentShaderGlobals,
-#elif _CSM_USE_GLES20
-  Gles20FragmentShaderGlobals,
-#endif
-  CommonFragmentShaderGlobals,
-#if _CSM_USE_GL33
-  Gl33NonMaskedFragmentShaderMain,
-#elif _CSM_USE_GLES20
-  Gles20NonMaskedFragmentShaderMain,
-#endif
-};
-
-/// Non-masked fragment shader code.
-static const GLchar* MaskedFragmentShaderCode[] =
-{
-#if _CSM_USE_GL33
-  Gl33FragmentShaderGlobals,
-#elif _CSM_USE_GLES20
-  Gles20FragmentShaderGlobals,
-#endif
-  CommonFragmentShaderGlobals,
-#if _CSM_USE_GL33
-  Gl33MaskedFragmentShaderMain,
-#elif _CSM_USE_GLES20
-  Gles20MaskedFragmentShaderMain,
-#endif
-};
 
 
 /// Programs reference counter.
@@ -332,15 +263,8 @@ void RequireGlPrograms()
     LoadGl();
 
 
-    Programs[0] = MakeProgram(CommonVertexShaderCode,
-                              (GLsizei)(sizeof(CommonVertexShaderCode) / sizeof(const char*)),
-                              NonMaskedFragmentShaderCode,
-                              (GLsizei)(sizeof(NonMaskedFragmentShaderCode) / sizeof(const char*)));
-
-    Programs[1] = MakeProgram(CommonVertexShaderCode,
-                              (GLsizei)(sizeof(CommonVertexShaderCode) / sizeof(const char*)),
-                              MaskedFragmentShaderCode,
-                              (GLsizei)(sizeof(MaskedFragmentShaderCode) / sizeof(const char*)));
+    Programs[0] = MakeProgram(VertexShaderCode, NonMaskedFragmentShaderCode);
+    Programs[1] = MakeProgram(VertexShaderCode, MaskedFragmentShaderCode);
   }
 
 

@@ -154,44 +154,13 @@ void BindGlBuffer(GlBuffer* buffer);
 void UnbindGlBuffer(GlBuffer* buffer);
 
 
-// Maps an OpenGL buffer. It's always a good idea to only map one buffer at a time...
+// Writes data to an OpenGL buffer.
 //
-// @param  buffer  Buffer to map.
-//
-// @return  Valid pointer to mapped buffer on success; '0' otherwise.
-void* MapGlBufferForWrite(GlBuffer* buffer);
-
-/// Unmaps an OpenGL buffer. (Actually unmaps any buffer of matching type)...
-/// Always make sure to unmap as early as possible.
-///
-/// @param  buffer  Buffer to unmap.
-void UnmapGlBuffer(GlBuffer* buffer);
-
-
-// ---------------- //
-// GL VERTEX ARRAYS //
-// ---------------- //
-
-/// Creates an unitialized vertex array.
-///
-/// @param  array  Array to initialize.
-void MakeGlVertexArrayInPlace(GLuint* array);
-
-/// Frees OpenGL resources.
-///
-/// @param  array  Array to release.
-void ReleaseGlVertexArray(GLuint* array);
-
-
-/// Binds a vertex array.
-///
-/// @param  array  Vertex array to bind.
-void BindGlVertexArray(const GLuint* array);
-
-/// Unbinds a vertex array. (Actually unbinds any vertex arrays)...
-/// 
-/// @param  array  Array to unbind.
-void UnbindGlVertexArray(const GLuint* array);
+// @param  buffer           Buffer to write to.
+// @param  offset           Offset bytes of writing start.
+// @param  sizeofData       Size of data.
+// @param  data             Source of data.
+void WriteToGlBuffer(GlBuffer* buffer, const GLintptr offset, const GLsizeiptr sizeofData, const void* data);
 
 
 // ----------- //

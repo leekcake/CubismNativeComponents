@@ -1,7 +1,7 @@
 # Cubism SDK For Native Development
 
 Welcome to the open components of the Cubism SDK For Native Development.
-While the Cubism Core, which you can obtain from [here](https://live2d.github.io),
+While the Cubism Core, which you can obtain from [here](https://live2d.github.io/#native),
 is feature-complete in regard to Cubism 3.0 features and well tested (it actually powers the SDK For Unity),
 **the open components are work-in-progress**.
 They're not yet feature-complete and their API isn't fixed yet (and the samples are only tested on Linux, macOS and Windows).
@@ -39,6 +39,7 @@ Include the internal headers for the memory layout of types and advanced usage.
 
 The framework contains functionality for playing back and blending animations as well as convenience functions for the Cubism Core.
 
+
 #### Dependencies
 
 The framework only depends on the C standard library (and the Cubism Core library, obviously).
@@ -56,13 +57,11 @@ so its main goal is to be easily readable and understandable and not performance
 If you don't want to start completely from scratch, the internal rendering header contains a 'barebone' renderer version,
 that takes care of preparing and syncing vertices and indices with the GPU, while allowing you to render the way you want.
 
+
 #### Dependencies
 
 The implementation depends on the C standard library, the Cubism Core library; OpenGL rendering functionality on OpenGL.
-On desktop OpenGL functions are loaded using [glad](https://github.com/Dav1dde/glad);
-on mobile OpenGLES 2.0 is used (including the extensions
-[OES_mapbuffer](https://www.khronos.org/registry/OpenGL/extensions/OES/OES_mapbuffer.txt) and
-[OES_vertex_array_object](https://www.khronos.org/registry/OpenGL/extensions/OES/OES_vertex_array_object.txt)).
+On desktop OpenGL 3.0 functions are loaded using [glad](https://github.com/Dav1dde/glad); on mobile OpenGLES 2.0 is used.
 
 
 ## Samples
@@ -79,20 +78,103 @@ The samples depend on the C standard library, the Cubism Core, [SDL2](https://ww
 [stb](https://github.com/nothings/stb), and [glad](https://github.com/Dav1dde/glad).
 
 Except SDL2, vendor dependencies are automatically downloaded on first build.
+The SDL team favors building against dynamic SDL2 libraries, but we link against static ones in the samples.
 
 Project files and makefiles can be generated with the [CMake project](https://github.com/Live2D/CubismNativeComponents/blob/early-access/CMakeLists.txt) included.
 Make sure to have CMake 3.6+ and git available prior generating using the CMake project.
 
 
-#### Building
+#### Build Prerequisites
 
-1. Download the Cubism Core from [here](live2d.github.io) and put the deflated files into the root directory of this project.
+1. Download the Cubism Core from [here](https://live2d.github.io/#native) and put the deflated files into the root directory of this project.
 1. Download [SDL 2.0.5 source code](https://www.libsdl.org/download-2.0.php) and put deflated folder into `./Samples/vendor`.
-1. Generate make or project files for Linux, macOS or Windows using [CMake](https://cmake.org/runningcmake/).
-1. Build the samples and run them from the build directory.
 
+#### Building Linux, macOS and Windows
+
+1. Generate makefiles or project files from the included CMake project using [CMake](https://cmake.org/runningcmake/).
+1. Build.
+1. Run them from the build directory.
+
+#### Building Android
+
+1. Import the SDL2 Android project into Android Studio 2.2+.
+1. Set up Gradle as shown below.
+1. Edit the `SDL2Activity.java` to load one of the native sample libraries as shown below.
+1. Copy the sample models into the project. See the sample Gradle below for details.
+
+`build.gradle(Module: app)`
+
+```gradle
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        applicationId "org.libsdl.app"
+        minSdkVersion 18
+        targetSdkVersion 18
+
+        // Filter out ABIs not matching the distributed Core libraries.
+        ndk {
+//          abiFilters "armeabi"
+            abiFilters "armeabi-v7a"
+//          abiFilters "arm64-v8a"
+            abiFilters "x86"
+            moduleName 'main'
+        }
+
+        // Enforce 'arm'.
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_ARM_MODE=arm"
+            }
+        }
+    }
+
+    // Specify assets directory. Make sure to create a folder named 'Assets' within that folder and copy the sample models into that folder.
+    sourceSets.main {
+        assets.srcDirs = ['src/main/assets']
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    // Set the path to the Components CMake project.
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+}
+```
+
+`SDLActivity.java`
+
+```java
+/**
+  * This method is called by SDL before loading the native shared libraries.
+  * It can be overridden to provide names of shared libraries to be loaded.
+  * The default implementation returns the defaults. It never returns null.
+  * An array returned by a new implementation must at least contain "SDL2".
+  * Also keep in mind that the order the libraries are loaded may matter.
+  * @return names of shared libraries to be loaded (e.g. "SDL2", "main").
+  */
+protected String[] getLibraries() {
+    return new String[] {
+        "HelloCubism"
+//      "HelloAnimation"
+    };
+}
+```
 
 ## Code Snippets
+
 
 #### Instantiating A Model.
 
@@ -142,13 +224,12 @@ Please limit the discussion to English and keep it professional and things on to
 
 ## Todo
 
-- Test and debug OpenGLES 2.0 renderer.
+- Test samples on mobile and add build instructions.
 - Add more code snippets.
 - Implement physics.
 - Implement API usage sanity checks.
 - Add document on coding style.
 - Profile and optimize framework.
-- Provide instructions for building samples on mobile. 
 
 ## License
 

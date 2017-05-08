@@ -38,7 +38,11 @@ Maskbuffer;
 // FUNCTIONS //
 // --------- //
 
-/// TODO  Document.
+/// Creates a mask buffer.
+///
+/// @param  size  Size of buffer to create in pixels.
+///
+/// @return  Handle to buffer.
 static Maskbuffer MakeMaskbuffer(const GLint size)
 {
   GLint userFramebuffer;
@@ -48,46 +52,46 @@ static Maskbuffer MakeMaskbuffer(const GLint size)
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &userFramebuffer);
 
 
-	// Create texture.
-	glGenTextures(1, &buffer.Texture);
+  // Create texture.
+  glGenTextures(1, &buffer.Texture);
 
 
-	glBindTexture(GL_TEXTURE_2D, buffer.Texture);
+  glBindTexture(GL_TEXTURE_2D, buffer.Texture);
 
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 	
 
   // Create (dummy) depth buffer.
-	glGenRenderbuffers(1, &buffer.DepthAttachment);
+  glGenRenderbuffers(1, &buffer.DepthAttachment);
 
 
-	glBindRenderbuffer(GL_RENDERBUFFER, buffer.DepthAttachment);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size, size);
+  glBindRenderbuffer(GL_RENDERBUFFER, buffer.DepthAttachment);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size, size);
 
 
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 
   // Create framebuufer.
-	glGenFramebuffers(1, &buffer.Handle);
+  glGenFramebuffers(1, &buffer.Handle);
 
 
-	glBindFramebuffer(GL_FRAMEBUFFER, buffer.Handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, buffer.Handle);
 
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.Texture, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.DepthAttachment); 
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.Texture, 0);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.DepthAttachment); 
 
 
- 	glBindFramebuffer(GL_FRAMEBUFFER, userFramebuffer);
+   glBindFramebuffer(GL_FRAMEBUFFER, userFramebuffer);
 
 
   // Store size.
@@ -97,12 +101,14 @@ static Maskbuffer MakeMaskbuffer(const GLint size)
   return buffer;
 }
 
-/// TODO  Document.
+/// Releases OpenGL resources.
+///
+/// @param  buffer  Buffer to release.
 static void ReleaseMaskbuffer(Maskbuffer* buffer)
 {
   glDeleteFramebuffers(1, &buffer->Handle);
-	glDeleteRenderbuffers(1, &buffer->DepthAttachment);
-	glDeleteTextures(1, &buffer->Texture);
+  glDeleteRenderbuffers(1, &buffer->DepthAttachment);
+  glDeleteTextures(1, &buffer->Texture);
 }
 
 
@@ -156,7 +162,7 @@ void ActivateGlMaskbuffer()
 
   // Store user viewport and framebuffer.
   glGetIntegerv(GL_VIEWPORT, UserViewport);
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &UserFramebuffer);
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &UserFramebuffer);
 
 
   // TODO  Resize mask buffer to match user viewport.
@@ -164,7 +170,7 @@ void ActivateGlMaskbuffer()
 
   // Switch buffer and viewport.
   glBindFramebuffer(GL_FRAMEBUFFER, Singleton.Handle);
-	glViewport(0, 0, Singleton.Size, Singleton.Size);
+  glViewport(0, 0, Singleton.Size, Singleton.Size);
 
 
   // Wipe buffer.

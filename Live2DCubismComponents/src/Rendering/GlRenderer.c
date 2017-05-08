@@ -22,6 +22,12 @@
 
 
 // --------- //
+// CONSTANTS //
+// --------- //
+enum { TemporaryBufferLength = 128 };
+
+
+// --------- //
 // FUNCTIONS //
 // --------- //
 
@@ -56,10 +62,9 @@ static void InitializeBuffersAndVertexArray(csmGlRenderer* renderer,
                                             const GLint vertexPositionAttributeLocation,
                                             const GLint vertexUvAttributeLocation)
 {
-  int totalVertexCount, totalIndexCount, d, i;
+  int totalVertexCount, totalIndexCount, d, i, j;
   const int* vertexCounts, * indexCounts;
-  csmVector2* mappedAttributeBuffer;
-  unsigned short* mappedIndexBuffer;
+  unsigned short temporaryIndexBuffer[TemporaryBufferLength];
   RenderDrawable* renderDrawables;
   const unsigned short** indices;
   const csmVector2** vertexUvs;
@@ -87,65 +92,68 @@ static void InitializeBuffersAndVertexArray(csmGlRenderer* renderer,
   MakeStaticGlBufferInPlace(&renderer->Buffers.Indices, GL_ELEMENT_ARRAY_BUFFER, ToSizeofIndexData(totalIndexCount));
 
 
-  // Create and initialize vertex array.
-  MakeGlVertexArrayInPlace(&renderer->VertexArray);
-  BindGlVertexArray(&renderer->VertexArray);
-
-
-  BindGlBuffer(&renderer->Buffers.Positions);
-  glVertexAttribPointer(vertexPositionAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-  BindGlBuffer(&renderer->Buffers.Uvs);
-  glVertexAttribPointer(vertexUvAttributeLocation, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-
-  BindGlBuffer(&renderer->Buffers.Indices);
-
-
-  // Unbind resources.
-  UnbindGlVertexArray(&renderer->VertexArray);
-  UnbindGlBuffer(&renderer->Buffers.Uvs);
-  UnbindGlBuffer(&renderer->Buffers.Indices);
-
-
   // Initialize static buffers.
   renderDrawables = renderer->RenderDrawables;
   
   
   vertexUvs = csmGetDrawableVertexUvs(renderer->Model);
-  mappedAttributeBuffer = MapGlBufferForWrite(&renderer->Buffers.Uvs);
+  BindGlBuffer(&renderer->Buffers.Uvs);
 
 
   for (d = 0; d < renderer->DrawableCount; ++d)
   {
-    memcpy(mappedAttributeBuffer + renderDrawables[d].Vertices.BaseIndex, vertexUvs[d], ToSizeofVertexData(renderDrawables[d].Vertices.Count));
+    WriteToGlBuffer(&renderer->Buffers.Uvs, ToSizeofVertexData(renderDrawables[d].Vertices.BaseIndex), ToSizeofVertexData(renderDrawables[d].Vertices.Count), vertexUvs[d]);
   }
 
 
-  UnmapGlBuffer(&renderer->Buffers.Uvs);
+  UnbindGlBuffer(&renderer->Buffers.Uvs);
 
 
   // We store all vertices in one large buffer.
   // As 'glDrawElementsBaseVertex()' is pretty new on mobile, we patch vertex indices by hand here.
   indices = csmGetDrawableIndices(renderer->Model);
-  mappedIndexBuffer = MapGlBufferForWrite(&renderer->Buffers.Indices);
+  BindGlBuffer(&renderer->Buffers.Indices);
+
+
+  i = 0;
+  j = 0;
 
 
   for (d = 0; d < renderer->DrawableCount; ++d)
   {
-    for (i = 0; i < renderDrawables[d].Indices.Count; ++i)
+   Loop:
+
+    while (j < TemporaryBufferLength)
     {
-      mappedIndexBuffer[i + renderDrawables[d].Indices.BaseIndex] = indices[d][i] + renderDrawables[d].Vertices.BaseIndex; 
+      if (i >= renderDrawables[d].Indices.Count)
+      {
+        break;
+      }
+      
+
+      temporaryIndexBuffer[j] = indices[d][i] + renderDrawables[d].Vertices.BaseIndex;;
+
+
+      ++j;
+      ++i;
     }
+
+
+    WriteToGlBuffer(&renderer->Buffers.Indices, ToSizeofIndexData((i - j) + renderDrawables[d].Indices.BaseIndex), ToSizeofIndexData(j), temporaryIndexBuffer);
+    j = 0;
+
+
+    if (i < renderDrawables[d].Indices.Count)
+    {
+      goto Loop;
+    }
+
+
+    i = 0;
   }
 
 
-  UnmapGlBuffer(&renderer->Buffers.Indices);
+  UnbindGlBuffer(&renderer->Buffers.Indices);
 }
 
 
@@ -225,7 +233,6 @@ csmGlRenderer* csmMakeBareboneGlRendererInPlace(csmModel* model,
 void csmReleaseGlRenderer(csmGlRenderer* renderer)
 {
 	// Release GL resources.
-	ReleaseGlVertexArray(&renderer->VertexArray);
 	ReleaseGlBuffer(&renderer->Buffers.Indices);
 	ReleaseGlBuffer(&renderer->Buffers.Uvs);
 	ReleaseGlBuffer(&renderer->Buffers.Positions);
@@ -261,7 +268,7 @@ void csmUpdateGlRenderer(csmGlRenderer* renderer)
 
 
   // Fetch dynamic data.
-  mappedAttributeBuffer = MapGlBufferForWrite(&renderer->Buffers.Positions);
+  BindGlBuffer(&renderer->Buffers.Positions);
 
 
   for (d = 0; d < renderer->DrawableCount; ++d)
@@ -274,7 +281,7 @@ void csmUpdateGlRenderer(csmGlRenderer* renderer)
     // Do expensive updates only if necessary.
     if (IsBitSet(dynamicFlags[d], csmVertexPositionsDidChange))
     {
-      memcpy(mappedAttributeBuffer + renderDrawables[d].Vertices.BaseIndex, vertexPositions[d], ToSizeofVertexData(renderDrawables[d].Vertices.Count));
+      WriteToGlBuffer(&renderer->Buffers.Positions, ToSizeofVertexData(renderDrawables[d].Vertices.BaseIndex), ToSizeofVertexData(renderDrawables[d].Vertices.Count), vertexPositions[d]);
     }
 
 
@@ -283,7 +290,7 @@ void csmUpdateGlRenderer(csmGlRenderer* renderer)
   }
 
 
-  UnmapGlBuffer(&renderer->Buffers.Positions);
+  UnbindGlBuffer(&renderer->Buffers.Positions);
 
 
   // Do sort if necessary.

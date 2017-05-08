@@ -224,7 +224,7 @@ static void SetGlState(DrawContext* context, const csmRenderDrawable* renderDraw
 // IMPLEMENTATION //
 // -------------- //
 
-void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textures)
+void csmGlDraw(csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textures)
 {
   const RenderDrawable* renderDrawable;
   DrawContext context;
@@ -243,8 +243,20 @@ void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* 
 
 
   // Bind geometry.
-  BindGlVertexArray(&renderer->VertexArray);
+  BindGlBuffer(&renderer->Buffers.Positions);
+  glVertexAttribPointer(GetGlVertexPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+
+  BindGlBuffer(&renderer->Buffers.Uvs);
+  glVertexAttribPointer(GetGlVertexUvLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+
+
+  BindGlBuffer(&renderer->Buffers.Indices);
+  
 
   // Draw.
   for (d = 0; d < renderer->DrawableCount; ++d)
@@ -273,5 +285,6 @@ void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* 
 
 
   // Unbind geometry.
-  UnbindGlVertexArray(&renderer->VertexArray);
+  UnbindGlBuffer(&renderer->Buffers.Uvs);
+  UnbindGlBuffer(&renderer->Buffers.Indices);
 }

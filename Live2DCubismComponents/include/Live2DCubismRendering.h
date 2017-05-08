@@ -106,7 +106,7 @@ void csmUpdateGlRenderer(csmGlRenderer* renderer);
 /// @param  renderer  Model renderer.
 /// @param  mvp       4x4 model-view-projection matrix.
 /// @param  textures  Model texture(s).
-void csmGlDraw(const csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textures);
+void csmGlDraw(csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textures);
 
 
 #endif

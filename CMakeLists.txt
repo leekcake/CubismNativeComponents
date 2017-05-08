@@ -209,8 +209,7 @@ if (_CSM_BUILD_RENDERING)
       ${_CSM_RENDERING_SOURCE_DIR}/GlMaskbuffer.c
       ${_CSM_RENDERING_SOURCE_DIR}/GlProgram.c
       ${_CSM_RENDERING_SOURCE_DIR}/GlRenderer.c
-      ${_CSM_RENDERING_SOURCE_DIR}/GlVersion.c
-      ${_CSM_RENDERING_SOURCE_DIR}/GlVertexArray.c)
+      ${_CSM_RENDERING_SOURCE_DIR}/GlVersion.c)
 
 
     # Make sure to include glad on desktop...
@@ -282,6 +281,21 @@ if (_CSM_BUILD_SAMPLES)
   set(SDL_SHARED OFF CACHE BOOL "" FORCE)
   set(SDL_STATIC ON  CACHE BOOL "" FORCE)
 
+
+  # Turn off unused libraries.
+  set(SDL_AUDIO      OFF CACHE BOOL "" FORCE)
+  set(SDL_CPUINFO    OFF CACHE BOOL "" FORCE)
+  set(SDL_FILE       OFF CACHE BOOL "" FORCE)
+  set(SDL_FILESYSTEM OFF CACHE BOOL "" FORCE)
+  set(SDL_RENDER     OFF CACHE BOOL "" FORCE)
+  set(SDL_THREADS    OFF CACHE BOOL "" FORCE)
+
+  if (ANDROID)
+      set(SDL_LOADSO     OFF CACHE BOOL "" FORCE)
+  endif ()
+
+  set(PTHREADS OFF CACHE BOOL "" FORCE)
+
   
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Samples/vendor/SDL2-2.0.5)
 
@@ -326,6 +340,11 @@ if (_CSM_BUILD_SAMPLES)
   if (_CSM_INCLUDE_GLAD)
     list(APPEND _CSM_SAMPLES_INCLUDE_DIRS ${_CSM_GLAD_ROOT_DIR}/include)
     list(APPEND _CSM_SAMPLES_LIBS Glad)
+  endif ()
+
+
+  if (ANDROID)
+    list(APPEND _CSM_SAMPLES_LIBS log android)
   endif ()
 
 
@@ -396,10 +415,15 @@ if (_CSM_BUILD_SAMPLES)
 
 
   # Configure 'Hello Cubism'.
-  add_executable(HelloCubism
-    ${_CSM_SAMPLES_SOURCE_FILES}
-    ${_CSM_SAMPLES_SOURCE_DIR}/HelloCubism.c)
-
+  if (ANDROID)
+    add_library(HelloCubism SHARED 
+      ${_CSM_SAMPLES_SOURCE_FILES}
+      ${_CSM_SAMPLES_SOURCE_DIR}/HelloCubism.c)
+  else ()
+    add_executable(HelloCubism
+      ${_CSM_SAMPLES_SOURCE_FILES}
+      ${_CSM_SAMPLES_SOURCE_DIR}/HelloCubism.c)
+  endif ()
 
   target_include_directories(HelloCubism PRIVATE ${_CSM_SAMPLES_INCLUDE_DIRS})
   target_link_libraries(HelloCubism PRIVATE ${_CSM_SAMPLES_LIBS})
@@ -408,9 +432,15 @@ if (_CSM_BUILD_SAMPLES)
 
 
   # Configure 'Hello Animation'.
+  if (ANDROID)
+  add_library(HelloAnimation SHARED
+    ${_CSM_SAMPLES_SOURCE_FILES}
+    ${_CSM_SAMPLES_SOURCE_DIR}/HelloAnimation.c)
+  else ()
   add_executable(HelloAnimation
     ${_CSM_SAMPLES_SOURCE_FILES}
     ${_CSM_SAMPLES_SOURCE_DIR}/HelloAnimation.c)
+  endif ()
 
 
   target_include_directories(HelloAnimation PRIVATE ${_CSM_SAMPLES_INCLUDE_DIRS})
