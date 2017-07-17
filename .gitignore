@@ -1,0 +1,13 @@
+*.*
+
+
+!include/**/*.*
+!sample/**/*.*
+sample/vendor/**/*.*
+!sample/vendor/glad/**/*.*
+sample/vendor/stb-master/
+!src/**/*.*
+!.gitignore
+!CMakeLists.txt
+!License.md
+!Readme.md

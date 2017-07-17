@@ -4,7 +4,7 @@ Welcome to the open components of the Cubism SDK For Native Development.
 While the Cubism Core, which you can obtain from [here](https://live2d.github.io/#native),
 is feature-complete in regard to Cubism 3.0 features and well tested (it actually powers the SDK For Unity),
 **the open components are work-in-progress**.
-They're not yet feature-complete and their API isn't fixed yet (and the samples are only tested on Linux, macOS and Windows).
+They're not yet feature-complete and their API isn't fixed yet (and the sample is only tested on Android, iOS, Linux, macOS and Windows).
 
 If you're interested in why we're releasing the SDK anyway as early access, read on.
 
@@ -25,24 +25,21 @@ so it would be great if you could give the SDK a try and provide any feedback th
 The Cubism 3.0 SDK has been rewritten from scratch and much more 'low level' and modular than its predecessors.
 It exposes a simple C APIs, and you can pick only the functionality you need.
 (Rendering functions are completely optional, for example).
-We have favoured this design approach because we think that instead of providing a complete, but black-box library
+We have favoured this design approach because we think that instead of providing a complete but black-box library,
 the native SDK should be as easy as possible to intergrate into your framework(s).
 
-The component APIs are split into two headers: one 'public', and one 'internal' (the one ending with `*Internal.h`).
-All types of non-fixed size are opaque in the public headers to provide a cleaner header and
-abstraction layer from the raw memory layout of those types.
+The component APIs are split into two headers: one 'public', and one 'internal' (the ones ending with `*INTERNAL.h`).
+All types of non-fixed size are opaque in the public headers to provide a cleaner interface and
+to abstract the memory layout of those types away.
 
-Include the internal headers for the memory layout of types and advanced usage.
+Include the internal headers for memory layout of types and advanced usage.
 
+
+## Components
 
 ### Framework
 
 The framework contains functionality for playing back and blending animations as well as convenience functions for the Cubism Core.
-
-
-#### Dependencies
-
-The framework only depends on the C standard library (and the Cubism Core library, obviously).
 
 
 ### Reference Rendering Implementation
@@ -58,49 +55,68 @@ If you don't want to start completely from scratch, the internal rendering heade
 that takes care of preparing and syncing vertices and indices with the GPU, while allowing you to render the way you want.
 
 
-#### Dependencies
+### Dependencies
 
-The implementation depends on the C standard library, the Cubism Core library; OpenGL rendering functionality on OpenGL.
-On desktop OpenGL 3.0 functions are loaded using [glad](https://github.com/Dav1dde/glad); on mobile OpenGLES 2.0 is used.
+Both framework and rendering depend on the C standard library and - obviously - the Core library.
+They don't link against the Core itself, so make sure to allow them to link to the Core library as fit.
+
+Furthermore, the rendering depends on OpenGLES 2.0 for mobile and on an OpenGL 3.3+ context for desktop.
+While the rendering automatically includes the OpenGLES 2.0 header when compiling for mobile,
+it doesn't include an OpenGL header when compiling for desktop.
+This allows you to have the rendering use the OpenGL wrapper you want.
+
+Check out the [sample](https://github.com/Live2D/CubismNativeComponents/blob/early-access/sample)
+to get an idea how setting headers and link libraries can be done.
 
 
-## Samples
+### Building
 
-The project includes 2 samples to get you started:
+The most straightforward way to build the components is to use the [CMake project](https://github.com/Live2D/CubismNativeComponents/blob/early-access/CMakeLists.txt) provided.
 
-1. `./Samples/HelloCubism.c` shows the basics of manually controlling a model.
-1. `./Samples/HelloAnimation.c` shows how to animate a model by blending animations.
+
+## Sample
+
+The project includes a sample that shows how you how to use the components.
 
 
 #### Dependencies
 
 The samples depend on the C standard library, the Cubism Core, [SDL2](https://www.libsdl.org),
-[stb](https://github.com/nothings/stb), and [glad](https://github.com/Dav1dde/glad).
+[stb](https://github.com/nothings/stb)(, and [glad](https://github.com/Dav1dde/glad) on desktop).
 
-Except SDL2, vendor dependencies are automatically downloaded on first build.
-The SDL team favors building against dynamic SDL2 libraries, but we link against static ones in the samples.
+Vendor dependencies are automatically downloaded as required using CMake and git.
+The SDL team seems to favor building against dynamic SDL2 libraries, but we link against static ones in the sample.
 
-Project files and makefiles can be generated with the [CMake project](https://github.com/Live2D/CubismNativeComponents/blob/early-access/CMakeLists.txt) included.
-Make sure to have CMake 3.6+ and git available prior generating using the CMake project.
+Project files and makefiles can be generated with the [CMake project](https://github.com/Live2D/CubismNativeComponents/blob/early-access/sample/CMakeLists.txt) included.
+Make sure to have CMake 3.6+ and git available prior generating the CMake project.
 
 
 #### Build Prerequisites
 
-1. Download the Cubism Core from [here](https://live2d.github.io/#native) and put the deflated files into the root directory of this project.
-1. Download [SDL 2.0.5 source code](https://www.libsdl.org/download-2.0.php) and put deflated folder into `./Samples/vendor`.
+1. Download the Cubism Core from [here](https://live2d.github.io/#native), extract it, and put the files in this repository into a subfolder as shown below.
+
+```sh
+.
++-- Live2DCubismSdk
+|   +-- Core # <-- Included in zip
+|   +-- Components # <-- Files from this repository 
+```
+
 
 #### Building Linux, macOS and Windows
 
-1. Generate makefiles or project files from the included CMake project using [CMake](https://cmake.org/runningcmake/).
-1. Build.
-1. Run them from the build directory.
+1. Generate makefiles from the CMake project using [CMake](https://cmake.org/runningcmake/). ([Make sure to have a C++ toolset enabled on Windows](https://msdn.microsoft.com/en-us/library/x4d2c09s.aspx)).
+1. Run `make`. (`nmake` on Windows). This will fetch all dependencies.
+1. Generate the project once more. This will enable building the actual sample.
+1. Run `make`. (`nmake` on Windows).
+1. Run `./HelloCubism`.
 
 #### Building Android
 
-1. Import the SDL2 Android project into Android Studio 2.2+.
+1. First build the sample for your host to make sure you have all dependencies required.
+1. Import the SDL2 Android project included in SDL2 into Android Studio 2.2+.
 1. Set up Gradle as shown below.
-1. Edit the `SDL2Activity.java` to load one of the native sample libraries as shown below.
-1. Copy the sample models into the project. See the sample Gradle below for details.
+1. Edit the `SDL2Activity.java` to the native library as shown below.
 
 `build.gradle(Module: app)`
 
@@ -118,9 +134,7 @@ android {
 
         // Filter out ABIs not matching the distributed Core libraries.
         ndk {
-//          abiFilters "armeabi"
             abiFilters "armeabi-v7a"
-//          abiFilters "arm64-v8a"
             abiFilters "x86"
             moduleName 'main'
         }
@@ -133,9 +147,9 @@ android {
         }
     }
 
-    // Specify assets directory. Make sure to create a folder named 'Assets' within that folder and copy the sample models into that folder.
+    // Specify assets directory.
     sourceSets.main {
-        assets.srcDirs = ['src/main/assets']
+        assets.srcDirs = ["<path-to-sample-CMakeLists.txt>/assets"]
     }
 
     buildTypes {
@@ -145,10 +159,10 @@ android {
         }
     }
 
-    // Set the path to the Components CMake project.
+    // Set path to sample CMake project.
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path "<path-to-sample-CMakeLists.txt>/CMakeLists.txt"
         }
     }
 }
@@ -168,15 +182,27 @@ android {
 protected String[] getLibraries() {
     return new String[] {
         "HelloCubism"
-//      "HelloAnimation"
     };
 }
 ```
 
+### Building iOS
+
+1. First build the sample for your host to make sure you have all dependencies required.
+1. Open the SDL2 `Xcode-iOS/SDL/SDL.xcodeproj` and build a static library for your target device.
+1. Create a SDL2 template project. (If you're doing this for the first time, [here's a nice walkthrough](http://lazyfoo.net/tutorials/SDL/52_hello_mobile/ios_mac/index.php)).
+1. Add `AVFoundation.framework` to `Frameworks`. (Otherwise, [you get some nasty link errors](https://discourse.libsdl.org/t/improving-the-ios-experience/22623/7)).
+1. Add the Core iOS library.
+1. Add the source files from `./sample/src` and `./src` to the project.
+1. Add the `./include`, `./sample/vendor/stb-master` and the directory containing the Core header file to include paths.
+1. Add `_USE_GLES20`, `_IOS`, `_CSM_COMPONENTS_IOS`, `_CSM_COMPONENTS_USE_GLES20` to preprocessor defines.
+1. Add the files from `./sample/assets` as resources to the project.
+1. Build the project.
+
+
 ## Code Snippets
 
-
-#### Instantiating A Model.
+#### Instantiating a Model.
 
 *Be aware that memory alignment constraints exist when instantiating models*.
 
@@ -207,7 +233,7 @@ csmModel* model = csmInitializeModelInPlace(moc, modelBuffer, modelSize);
 // As you are the owner of both moc and model memory, you can free both whenever you want.
 ```
 
-For more snippets-like code, check out `./Samples/src/SampleModel.c`. 
+For more snippets-like code, check out `./sample/src/HelloCubism.c`. 
 
 
 ## Contributing
@@ -224,16 +250,13 @@ Please limit the discussion to English and keep it professional and things on to
 
 ## Todo
 
-- Test samples on mobile and add build instructions.
-- Add more code snippets.
-- Implement physics.
-- Implement API usage sanity checks.
 - Add document on coding style.
-- Profile and optimize framework.
+- Implement physics.
+- Add more code snippets.
 
 ## License
 
-The license that applies to the source code in this project allows you modify all sources without the need to submit any changes you made.
+The license applying to the source code in this project allows you modify all sources without the need to submit any changes you made.
 Whenever releasing a product using source code from this project,
 you just have to make sure that you link your product with the Core distributed with the SDK package.
 Refer to [this license](http://live2d.com/eula/live2d-open-software-license-agreement_en.html) for the gritty details.
