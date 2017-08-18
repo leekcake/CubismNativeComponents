@@ -39,7 +39,7 @@ if (_DESKTOP)
 
 # ... and OpenGL ES 2.0 flag else.
 else ()
-  set(_USE_GLES20)
+  set(_USE_GLES20 ON)
 endif ()
 
 
