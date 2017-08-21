@@ -27,7 +27,7 @@ endif ()
 
 
 # Detect desktop.
-if (NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN)
+if (NOT ANDROID AND NOT IOS AND NOT EMSCRIPTEN AND NOT RPI)
   set(_DESKTOP ON)
 endif ()
 

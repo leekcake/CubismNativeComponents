@@ -130,7 +130,11 @@ int main(int argumentCount, char *arguments[])
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #endif
+#if _RPI
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_EGL, SDL_GL_CONTEXT_PROFILE_ES);
+#else
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, SDL_TRUE);
 
 
@@ -183,8 +187,9 @@ int main(int argumentCount, char *arguments[])
   
 
   // Loop.
+#if !_RPI
 	SDL_GL_SetSwapInterval(1);
-
+#endif
 
 	lastCounter = SDL_GetPerformanceCounter();
 	exitLoop = 0;

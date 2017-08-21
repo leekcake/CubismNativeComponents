@@ -33,7 +33,7 @@ set(CSM_COMPONENTS_CORE_INCLUDE_DIRECTORY "../Core/include" CACHE STRING "Path t
 option(CSM_COMPONENTS_BUILD_GL_RENDERER "Enables OpenGL reference renderer." OFF)
 
 # Path to OpenGL header on desktop.
-if (NOT ANDROID AND NOT EMSCRIPTEN AND NOT IOS)
+if (NOT ANDROID AND NOT EMSCRIPTEN AND NOT IOS AND NOT RPI)
   set(CSM_COMPONENTS_GL_H "" CACHE STRING "Path to OpenGL header.")
 endif ()
 
@@ -57,7 +57,7 @@ endif ()
 
 
 # Detect desktop.
-if (NOT ANDROID AND NOT EMSCRIPTEN AND NOT IOS)
+if (NOT ANDROID AND NOT EMSCRIPTEN AND NOT IOS AND NOT RPI)
   set(_CSM_COMPONENTS_DESKTOP ON)
 endif ()
 
