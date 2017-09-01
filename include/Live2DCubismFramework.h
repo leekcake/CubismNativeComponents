@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <Live2DCubismCore.h>
 
 // -------- //
 // REQUIRES //
@@ -107,6 +108,23 @@ csmModelAnimationCurveType;
 /// @param  value     Evaluated value.
 /// @param  userData  [Optional] User data.
 typedef void csmModelAnimationCurveHandler(const csmModel* model, const csmModelAnimationCurveType type, const float value, void* userData);
+
+
+// ------- //
+// PHYSICS //
+// ------- //
+
+// TODO Document
+typedef struct csmPhysicsRig csmPhysicsRig;
+
+// TODO Document
+typedef struct csmPhysicsOptions
+{
+  csmVector2 Gravity;
+
+  csmVector2 Wind;
+}
+csmPhysicsOptions;
 
 
 // ---------------- //
@@ -248,3 +266,16 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
                               const csmModelHashTable* table,
                               csmModelAnimationCurveHandler handleModelCurve,
                               void* userData);
+
+// ------- //
+// PHYSICS //
+// ------- //
+
+// TODO Document
+unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson);
+
+// TODO Document
+csmPhysicsRig *csmDesirializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size);
+
+// TODO Document
+void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptions* options, float deltaTime);

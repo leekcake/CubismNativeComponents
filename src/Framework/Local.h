@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright(c) Live2D Inc. All rights reserved.
  * 
  * Use of this source code is governed by the Live2D Open Software license
@@ -7,6 +7,10 @@
 
 
 #pragma once
+
+
+#include <Live2DCubismCore.h>
+#include <Live2DCubismFrameworkINTERNAL.h>
 
 
 // -------- //
@@ -52,6 +56,30 @@ typedef struct MotionJsonMeta
   int AreBeziersRestricted;
 }
 MotionJsonMeta;
+
+// TODO Document
+typedef struct PhysicsJsonEffectiveForces
+{
+  csmVector2 Gravity;
+
+  csmVector2 Wind;
+}
+PhysicsJsonEffectiveForces;
+
+// TODO Document
+typedef struct PhysicsJsonMeta
+{
+  int SubRigCount;
+
+  int TotalInputCount;
+
+  int TotalOutputCount;
+
+  int ParticleCount;
+
+  PhysicsJsonEffectiveForces EffectiveForces;
+}
+PhysicsJsonMeta;
 
 
 // ---------- //
@@ -116,3 +144,73 @@ void ReadMotionJsonMeta(const char* motionJson, MotionJsonMeta* buffer);
 /// @param  motionJson  Motion JSON string.
 /// @param  buffer      Buffer to read into.
 void ReadMotionJson(const char* motionJson, csmAnimation* buffer);
+
+
+// ------------ //
+// PHYSICS JSON //
+// ------------ //
+
+// TODO Document
+void ReadPhysicsJsonMeta(const char* physicsJson, PhysicsJsonMeta* buffer);
+
+// TODO Document
+void ReadPhysicsJson(const char* physicsJson, csmPhysicsRig* buffer);
+
+
+// ------------ //
+// PHYSICS MATH //
+// ------------ //
+
+// TODO Document
+csmVector2 MakeVector2(float x, float y);
+
+// TODO Document
+csmVector2 AddVector2(csmVector2 a, csmVector2 b);
+
+// TODO Document
+csmVector2 SubVector2(csmVector2 a, csmVector2 b);
+
+// TODO Document
+csmVector2 MultiplyVector2(csmVector2 a, csmVector2 b);
+
+// TODO Document
+csmVector2 MultiplyVectoy2ByScalar(csmVector2 v, float s);
+
+// TODO Document
+csmVector2 DivideVector2(csmVector2 a, csmVector2 b);
+
+// TODO Document
+csmVector2 DivideVector2ByScalar(csmVector2 v, float s);
+
+// TODO Document
+float Distance(csmVector2 a, csmVector2 b);
+
+// TODO Document
+void Normalize(csmVector2* target);
+
+// TODO Document
+float DegreesToRadian(float degrees);
+
+// TODO Document
+float RadianToDegrees(float radian);
+
+// TODO Document
+float DirectionToRadian(csmVector2 from, csmVector2 to);
+
+// TODO Document
+float DirectionToDegrees(csmVector2 from, csmVector2 to);
+
+// TODO Document
+csmVector2 RadianToDirection(float totalAngle);
+
+// TODO Document
+float NormalizeParameterValue(
+  float value,
+  float parameterMinimum,
+  float parameterMaximum,
+  float parameterDefault,
+  float NormalizedMinimum,
+  float NormalizedMaximum,
+  float NormalizedDefault,
+  int isInverted
+  );

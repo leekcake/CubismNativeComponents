@@ -9,6 +9,9 @@
 #pragma once
 
 
+#include <Live2DCubismCore.h>
+
+
 // ----- //
 // TYPES //
 // ----- //
@@ -185,6 +188,184 @@ typedef struct csmAnimation
   csmAnimationPoint* Points;
 }
 csmAnimation;
+
+
+// ------- //
+// PHYSICS //
+// ------- //
+
+// TODO Document
+enum
+{
+  csmParameterPhysics,
+};
+
+// TODO Document
+enum
+{
+  csmSourceXPhysics,
+  
+  csmSourceYPhysics,
+
+  csmSourceAnglePhysics,
+};
+
+// TODO Document
+typedef struct csmPhysicsParameter
+{
+  csmHash Id;
+
+  short TargetType;
+}
+csmPhysicsParameter;
+
+// TODO Document
+typedef struct csmPhysicsNormalization
+{
+  float Minimum;
+  
+  float Maximum;
+
+  float Default;
+}
+csmPhysicsNormalization;
+
+// TODO Document
+typedef struct csmPhysicsParticle
+{
+  csmVector2 InitialPosition;
+
+  float Mobility;
+
+  float Delay;
+
+  float Acceleration;
+
+  float Radius;
+
+  csmVector2 Position;
+
+  csmVector2 LastPosition;
+
+  csmVector2 LastGravity;
+
+  csmVector2 Force;
+
+  csmVector2 Velocity;
+}
+csmPhysicsParticle;
+
+// TODO Document
+typedef struct csmPhysicsSubRig
+{
+  int InputCount;
+
+  int OutputCount;
+
+  int ParticleCount;
+
+  int BaseInputIndex;
+
+  int BaseOutputIndex;
+
+  int BaseParticleIndex;
+
+  csmPhysicsNormalization NormalizationPosition;
+
+  csmPhysicsNormalization NormalizationAngle;
+}
+csmPhysicsSubRig;
+
+// TODO Document
+typedef void(*NormalizedPhysicsParameterValueGetter)(
+  csmVector2* targetTranslation,
+  float* targetAngle,
+  float value,
+  float parameterMinimumValue,
+  float parameterMaximumValue,
+  float parameterDefaultValue,
+  csmPhysicsNormalization* normalizationPosition,
+  csmPhysicsNormalization* normalizationAngle,
+  int isInverted,
+  float weight
+  );
+
+// TODO Document
+typedef struct csmPhysicsInput
+{
+  csmPhysicsParameter Source;
+
+  int SourceParameterIndex;
+
+  float Weight;
+
+  short Type;
+
+  short Reflect;
+
+  NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
+}
+csmPhysicsInput;
+
+// TODO Document
+typedef float(*PhysicsValueGetter)(
+  csmVector2 translation,
+  csmPhysicsParticle* particles,
+  int particleIndex,
+  int isInverted,
+  csmVector2 parentGravity
+  );
+
+// TODO Document
+typedef float(*PhysicsScaleGetter)(csmVector2 translationScale, float angleScale);
+
+// TODO Document
+typedef struct csmPhysicsOutput
+{
+  csmPhysicsParameter Destination;
+
+  int DestinationParameterIndex;
+
+  int VertexIndex;
+
+  csmVector2 TranslationScale;
+
+  float AngleScale;
+
+  float Weight;
+
+  short Type;
+
+  short Reflect;
+
+  float ValueBelowMinimum;
+
+  float ValueExceededMaximum;
+
+  PhysicsValueGetter GetValue;
+
+  PhysicsScaleGetter GetScale;
+}
+csmPhysicsOutput;
+
+// TODO Document
+typedef struct csmPhysicsRig
+{
+  int SubRigCount;
+
+  csmPhysicsSubRig* Settings;
+
+  csmPhysicsInput* Inputs;
+
+  csmPhysicsOutput* Outputs;
+
+  csmPhysicsParticle* Particles;
+
+  csmVector2 Gravity;
+
+  csmVector2 Wind;
+}
+csmPhysicsRig;
 
 
 // ---------------- //

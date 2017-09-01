@@ -1,23 +1,7 @@
 # Cubism SDK For Native Development
 
 Welcome to the open components of the Cubism SDK For Native Development.
-While the Cubism Core, which you can obtain from [here](https://live2d.github.io/#native),
-is feature-complete in regard to Cubism 3.0 features and well tested (it actually powers the SDK For Unity),
-**the open components are work-in-progress**.
-They're not yet feature-complete and their API isn't fixed yet (and the sample is only tested on Android, iOS, Linux, macOS and Windows).
-
-If you're interested in why we're releasing the SDK anyway as early access, read on.
-
-If you came here looking for official Live2D homepage, instead, you'll find it [here](http://www.live2d.com/products/cubism3).
-
-
-## Why Early Access?
-
-With the Cubism 3.0 SDKs we strive to provide the SDKs you need.
-We shared the Unity SDK from the prototype stage with multiple developers and made sure to reflect their feedback.
-
-For the native SDK we take things one step further by opening the evaluation phase up for everyone,
-so it would be great if you could give the SDK a try and provide any feedback through this GitHub project.
+Came here looking for the official Live2D homepage? Go [here](http://www.live2d.com/products/cubism3).
 
 
 ## Design
@@ -39,7 +23,8 @@ Include the internal headers for memory layout of types and advanced usage.
 
 ### Framework
 
-The framework contains functionality for playing back and blending animations as well as convenience functions for the Cubism Core.
+The framework contains functionality for playing back and blending animations, and for simulating physics.
+It also provides convenience functions around the Cubism Core API.
 
 
 ### Reference Rendering Implementation
@@ -257,9 +242,8 @@ There are many ways to contribute to the project: logging bugs, submitting pull 
 Please limit the discussion to English and keep it professional and things on topic.
 
 
-## Todo
+## TODO
 
-- Implement physics.
 - Add more code snippets.
 
 ## License

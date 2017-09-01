@@ -117,7 +117,10 @@ set (_CSM_COMPONENTS_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Json.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/ModelExtensions.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/MotionJson.c
-  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/String.c)
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/String.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/PhysicsMath.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/PhysicsJson.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Physics.c)
 
 
 if (_CSM_COMPONENTS_BUILD_GL_RENDERER)
