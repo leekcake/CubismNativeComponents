@@ -240,7 +240,16 @@ For more snippets-like code, check out `./sample/src/HelloCubism.c`.
 
 There are many ways to contribute to the project: logging bugs, submitting pull requests, reporting issues, and creating suggestions.
 
-While any form of contributing is greatly appreciated, *suggestions regarding design and API are especially important to us* on this GitHub repository.
+### Coding Convention
+
+- **Avoid static and global variables** (unless they really help in providing a much cleaner API).
+- Use upper camelcase for types, functions and fields, e.g. `ReadMotionJson()`.
+- Use lower camelcase for local variables, e.g. `modelSize`.
+- Choose [meaningful names](https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/#examples) for types, functions, fields, and variables.
+- Start function names with a verb and make them as readable as English sentences as possible, e.g. `EvaluateAnimationSegment()` (and not ~~`AnimationSegmentEvaluate()`~~).
+- Use the internal headers (`*INTERNAL.H`) for providing additional functionality to advanced while keeping the public header clean.
+- Keep public and internal headers clean by anything that doesn't serve the API in source files and local header files.
+- Prefix all declarations in public and internal headers with `csm` (followed by upper camelcase), i.e. `csmModel`.
 
 
 ## Discussion Etiquette
@@ -250,7 +259,6 @@ Please limit the discussion to English and keep it professional and things on to
 
 ## Todo
 
-- Add document on coding style.
 - Implement physics.
 - Add more code snippets.
 
