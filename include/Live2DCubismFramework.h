@@ -275,7 +275,7 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
 unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson);
 
 // TODO Document
-csmPhysicsRig *csmDesirializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size);
+csmPhysicsRig *csmDeserializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size);
 
 // TODO Document
 void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptions* options, float deltaTime);

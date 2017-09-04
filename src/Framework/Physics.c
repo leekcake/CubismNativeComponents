@@ -23,7 +23,7 @@ const float MovementThreshold = 0.001f;
 
 
 // TODO Document
-static void csmPhysicsInitialize(csmPhysicsRig* physics)
+static void Initialize(csmPhysicsRig* physics)
 {
   csmPhysicsParticle* strand;
   csmPhysicsSubRig* currentSetting;
@@ -62,7 +62,7 @@ static void csmPhysicsInitialize(csmPhysicsRig* physics)
 }
 
 // TODO Document
-static void csmPhysicsUpdateOutputParameterValue(float* parameterValue, float parameterValueMinimum, float parameterValueMaximum, float translation, csmPhysicsOutput* output)
+static void UpdateOutputParameterValue(float* parameterValue, float parameterValueMinimum, float parameterValueMaximum, float translation, csmPhysicsOutput* output)
 {
   float outputScale;
   float value;
@@ -216,7 +216,7 @@ unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson)
 }
 
 // TODO Document
-csmPhysicsRig* csmDesirializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size)
+csmPhysicsRig* csmDeserializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size)
 {
   csmPhysicsRig* physics;
 
@@ -227,7 +227,7 @@ csmPhysicsRig* csmDesirializePhysicsInPlace(const char *physicsJson, void* addre
 
   ReadPhysicsJson(physicsJson, physics);
 
-  csmPhysicsInitialize(physics);
+  Initialize(physics);
 
   return physics;
 }
@@ -342,7 +342,7 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
       );
 
 
-      csmPhysicsUpdateOutputParameterValue(
+      UpdateOutputParameterValue(
         &parameterValue[currentOutput[i].DestinationParameterIndex],
         parameterMinimumValue[currentOutput[i].DestinationParameterIndex],
         parameterMaximumValue[currentOutput[i].DestinationParameterIndex],
