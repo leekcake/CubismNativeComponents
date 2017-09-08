@@ -150,10 +150,16 @@ void ReadMotionJson(const char* motionJson, csmAnimation* buffer);
 // PHYSICS JSON //
 // ------------ //
 
-// TODO Document
+/// Reads serialized physics meta.
+///
+/// @param  physicsJson  Physics JSON string.
+/// @param  buffer       Buffer to read into.
 void ReadPhysicsJsonMeta(const char* physicsJson, PhysicsJsonMeta* buffer);
 
-// TODO Document
+/// Reads a serialized physics.
+///
+/// @param  physicsJson  Physics JSON string.
+/// @param  buffer       Buffer to read into.
 void ReadPhysicsJson(const char* physicsJson, csmPhysicsRig* buffer);
 
 
@@ -161,49 +167,124 @@ void ReadPhysicsJson(const char* physicsJson, csmPhysicsRig* buffer);
 // PHYSICS MATH //
 // ------------ //
 
-// TODO Document
+/// Makes vector2 component.
+///
+/// @param  x  X-value.
+/// @param  y  Y-value.
+///
+/// @return  Vector2 component.
 csmVector2 MakeVector2(float x, float y);
 
-// TODO Document
+/// Adds vetor2.
+///
+/// @param  a  Value1.
+/// @param  b  Value2.
+///
+/// @return  a + b
 csmVector2 AddVector2(csmVector2 a, csmVector2 b);
 
-// TODO Document
+/// Subs vector2.
+///
+/// @param  a  Value1.
+/// @param  b  Value2.
+///
+/// @return  a - b
 csmVector2 SubVector2(csmVector2 a, csmVector2 b);
 
-// TODO Document
+/// Multiplies vector2.
+///
+/// @param  a  Value1.
+/// @param  b  Value2.
+///
+/// @return  a * b
 csmVector2 MultiplyVector2(csmVector2 a, csmVector2 b);
 
-// TODO Document
+/// Multiplies vector2 by scalar value.
+///
+/// @param  v  Vector value.
+/// @param  s  Scalar value.
+///
+/// @return  v * s
 csmVector2 MultiplyVectoy2ByScalar(csmVector2 v, float s);
 
-// TODO Document
+/// Divides vector2.
+///
+/// @param  a  Value1.
+/// @param  b  Value2.
+///
+/// @return  a / b
 csmVector2 DivideVector2(csmVector2 a, csmVector2 b);
 
-// TODO Document
+/// Divides vector2 by scalar value.
+///
+/// @param  v  Vector value.
+/// @param  s  Scalar value.
+///
+/// @return  v / s
 csmVector2 DivideVector2ByScalar(csmVector2 v, float s);
 
-// TODO Document
+/// Gets vector distance.
+///
+/// @param  a  Value1.
+/// @param  b  Value2.
+///
+/// @return  Length(a - b)
 float Distance(csmVector2 a, csmVector2 b);
 
-// TODO Document
+/// Normalizes vector.
+///
+/// @param  target  Target vector.
 void Normalize(csmVector2* target);
 
-// TODO Document
+/// Converts degrees to radians.
+///
+/// @param  degrees  Degrees.
+///
+/// @return  Radians.
 float DegreesToRadian(float degrees);
 
-// TODO Document
+/// Converts Radians to degrees.
+///
+/// @param  radian  Radians.
+///
+/// @return  Degrees.
 float RadianToDegrees(float radian);
 
-// TODO Document
+/// Converts direction to radians angle.
+///
+/// @param  from  Vector from.
+/// @param  to    Vector to.
+///
+/// @return  Radians angle from vector direction.
 float DirectionToRadian(csmVector2 from, csmVector2 to);
 
-// TODO Document
+/// Converts direction to degrees angle.
+///
+/// @param  from  Vector from.
+/// @param  to    Vector to.
+///
+/// @return  Degrees angle from vector direction.
 float DirectionToDegrees(csmVector2 from, csmVector2 to);
 
-// TODO Document
+/// Converts radians angle to direction.
+///
+/// @param  totalAngle  Radians angle.
+///
+/// @return  Vector direction from radians angle.
 csmVector2 RadianToDirection(float totalAngle);
 
-// TODO Document
+/// Gets normalized value from parameter value.
+///
+/// @param  value  Target value.
+/// @param  parameterMinimum   Minimum parameter value.
+/// @param  parameterMaximum   Maximum parameter value.
+/// @param  parameterDefault   Default parameter value.
+/// @param  NormalizedMinimum  Minimum normalized value.
+/// @param  NormalizedMaximum  Maximum normalized value.
+/// @param  NormalizedDefault  Default normalized value.
+/// @param  isInverted         Return value is inverted if true.
+///
+/// @return  Normalized value.
 float NormalizeParameterValue(
   float value,
   float parameterMinimum,

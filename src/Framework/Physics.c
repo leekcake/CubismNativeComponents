@@ -1,28 +1,46 @@
-#include <Live2DCubismFramework.h>
-#include <Live2DCubismFrameworkINTERNAL.h>
+/*
+* Copyright(c) Live2D Inc. All rights reserved.
+*
+* Use of this source code is governed by the Live2D Open Software license
+* that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
+*/
 
-#include <math.h>
 
 // -------- //
 // REQUIRES //
 // -------- //
+
+#include <Live2DCubismFramework.h>
+#include <Live2DCubismFrameworkINTERNAL.h>
+
+#include <math.h>
 
 #include "Local.h"
 
 #include <Live2DCubismCore.h>
 
 
-// TODO Document
+// --------- //
+// CONSTANTS //
+// --------- //
+
+/// Constant of air resistance.
 const float AirResistance = 5.0f;
 
-// TODO Document
+/// Constant of maximum weight of input and output ratio.
 const float MaximumWeight = 100.0f;
 
-// TODO Document
+/// Constant of threshold of movement.
 const float MovementThreshold = 0.001f;
 
 
-// TODO Document
+// -------------- //
+// IMPLEMENTATION //
+// -------------- //
+
+/// Initializes physics.
+/// 
+/// @param  physics  Target rig.
 static void Initialize(csmPhysicsRig* physics)
 {
   csmPhysicsParticle* strand;
@@ -61,7 +79,12 @@ static void Initialize(csmPhysicsRig* physics)
   }
 }
 
-// TODO Document
+/// Updates output parameter value.
+/// 
+/// @param  parameterValue         Target parameter value.
+/// @param  parameterValueMinimum  Minimum of parameter value.
+/// @param  parameterValueMaximum  Maximum of parameter value.
+/// @param  translation            Translation value.
 static void UpdateOutputParameterValue(float* parameterValue, float parameterValueMinimum, float parameterValueMaximum, float translation, csmPhysicsOutput* output)
 {
   float outputScale;
@@ -110,7 +133,15 @@ static void UpdateOutputParameterValue(float* parameterValue, float parameterVal
   }
 }
 
-// TODO Document
+/// Updates particles.
+/// 
+/// @param  strand            Target array of particle.
+/// @param  strandCount       Count of particle.
+/// @param  totalTranslation  Total translation value.
+/// @param  totalAngle        Total angle.
+/// @param  wind              Direction of wind.
+/// @param  thresholdValue    Threshold of movement.
+/// @param  deltaTime         Delta time.
 static void UpdateParticles(
   csmPhysicsParticle* strand,
   int strandCount,
@@ -201,7 +232,6 @@ static void UpdateParticles(
   }
 }
 
-// TODO Document
 unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson)
 {
   PhysicsJsonMeta meta;
@@ -215,7 +245,6 @@ unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson)
     (sizeof(csmPhysicsParticle) * meta.ParticleCount);
 }
 
-// TODO Document
 csmPhysicsRig* csmDeserializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size)
 {
   csmPhysicsRig* physics;
@@ -225,6 +254,7 @@ csmPhysicsRig* csmDeserializePhysicsInPlace(const char *physicsJson, void* addre
   physics = (csmPhysicsRig*)address;
 
 
+  // Deserialize physics.
   ReadPhysicsJson(physicsJson, physics);
 
   Initialize(physics);
@@ -232,7 +262,6 @@ csmPhysicsRig* csmDeserializePhysicsInPlace(const char *physicsJson, void* addre
   return physics;
 }
 
-// TODO Document
 void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptions* options, float deltaTime)
 {
   float totalAngle;
@@ -269,7 +298,7 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
     currentParticles = &physics->Particles[currentSetting->BaseParticleIndex];
 
     
-
+    // Load input parameters.
     for (i = 0; i < currentSetting->InputCount; ++i)
     {
       weight = currentInput[i].Weight / MaximumWeight;
@@ -306,6 +335,7 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
     totalTranslation.Y = (translationX * (float)sin(radAngle) + translationY * (float)cos(radAngle));
 
 
+    // Calculate particles position.
     UpdateParticles(
       currentParticles,
       currentSetting->ParticleCount,
@@ -317,6 +347,7 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
     );
 
 
+    // Update output parameters.
     for (i = 0; i < currentSetting->OutputCount; ++i)
     {
       particleIndex = currentOutput[i].VertexIndex;

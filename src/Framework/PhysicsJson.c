@@ -6,12 +6,11 @@
 */
 
 
-#include "Local.h"
-
-
 // -------- //
 // REQUIRES //
 // -------- //
+
+#include "Local.h"
 
 #include <Live2DCubismFrameworkINTERNAL.h>
 
@@ -1513,9 +1512,9 @@ static int ParsePhysics3(const char* jsonString, csmJsonTokenType type, int begi
   return context->State != FinishedParsing;
 }
 
-// ------------------- //
+// -------------------- //
 // PHYSICS JSON PARSING //
-// ------------------- //
+// -------------------- //
 
 /// Available physics meta readers.
 static csmJsonTokenHandler MetaParsers[] =
@@ -1536,7 +1535,6 @@ static csmJsonTokenHandler PhysicsParsers[] =
 };
 
 
-// TODO Document
 void ReadPhysicsJsonMeta(const char* physicsJson, PhysicsJsonMeta* buffer)
 {
   VersionParserContext versionParserContext;
@@ -1554,8 +1552,6 @@ void ReadPhysicsJsonMeta(const char* physicsJson, PhysicsJsonMeta* buffer)
   csmLexJson(physicsJson, MetaParsers[version], &context);
 }
 
-
-// TODO Document
 void ReadPhysicsJson(const char* physicsJson, csmPhysicsRig* buffer)
 {
   VersionParserContext versionParserContext;

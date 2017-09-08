@@ -271,11 +271,27 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
 // PHYSICS //
 // ------- //
 
-// TODO Document
+/// Gets the deserialized size of a serialized physics in bytes.
+///
+/// @param  physicsJson  Serialized physics to query for.
+///
+/// @return  Number of bytes necessary.
 unsigned int csmGetDeserializedSizeofPhysics(const char *physicsJson);
 
-// TODO Document
+
+/// Deserializes physics.
+///
+/// @param  physicsJson  Serialized physics.
+/// @param  address      Address to place deserialized animation at.
+/// @param  size         Size of passed memory block (in bytes).
+///
+/// @return  Valid pointer on success; '0' otherwise.
 csmPhysicsRig *csmDeserializePhysicsInPlace(const char *physicsJson, void* address, const unsigned int size);
 
-// TODO Document
+
+/// Evaluates physics.
+///
+/// @param  model  Model to apply result to.
+/// @param  physics  Physics to evaluate.
+/// @param  options  Options of evaluation.
 void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptions* options, float deltaTime);

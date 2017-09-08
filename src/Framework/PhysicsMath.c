@@ -1,37 +1,81 @@
+/*
+* Copyright(c) Live2D Inc. All rights reserved.
+*
+* Use of this source code is governed by the Live2D Open Software license
+* that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
+*/
+
+
+// -------- //
+// REQUIRES //
+// -------- //
+
 #include <Live2DCubismCore.h>
 #include <math.h>
 
 #include "Local.h"
 
-// TODO Document
+
+// --------- //
+// CONSTANTS //
+// --------- //
+
+/// Constant of Pi.
 const float PI = 3.14159f;
 
 
-// TODO Document
+// -------------- //
+// IMPLEMENTATION //
+// -------------- //
+
+/// Gets length of vector.
+///
+/// @param  vector  Target vector.
+///
+/// @return  Length of vector.
 static float Length(csmVector2 vector)
 {
   return (float)sqrt((vector.X * vector.X) + (vector.Y * vector.Y));
 }
 
-// TODO Document
+/// Calculates dot product.
+///
+/// @param  vector1  Vector1.
+/// @param  vector2  Vector2.
+///
+/// @return  Dot product for vector1 and vector2.
 static float Dot(csmVector2 vector1, csmVector2 vector2)
 {
   return (vector1.X * vector2.X) + (vector1.Y * vector2.Y);
 }
 
-// TODO Document
+/// Gets maximum.
+///
+/// @param  l  Left-hand value.
+/// @param  r  Right-hand value.
+///
+/// @return  Maximum value.
 static float Max(float l, float r)
 {
   return (l > r) ? l : r;
 }
 
-// TODO Document
+/// Gets minimum.
+///
+/// @param  l  Left-hand value.
+/// @param  r  Right-hand value.
+///
+/// @return  Minimum value.
 static float Min(float l, float r)
 {
   return (l > r) ? r : l;
 }
 
-// TODO Document
+/// Gets sign.
+///
+/// @param  value  Evaluation target value.
+///
+/// @return  Sign of value.
 static int Sign(float value)
 {
   int ret;
@@ -50,7 +94,6 @@ static int Sign(float value)
   return ret;
 }
 
-// TODO Document
 csmVector2 MakeVector2(float x, float y)
 {
   csmVector2 ret;
@@ -61,49 +104,41 @@ csmVector2 MakeVector2(float x, float y)
   return ret;
 }
 
-// TODO Document
 csmVector2 AddVector2(csmVector2 a, csmVector2 b)
 {
   return MakeVector2(a.X + b.X, a.Y + b.Y);
 }
 
-// TODO Document
 csmVector2 SubVector2(csmVector2 a, csmVector2 b)
 {
   return MakeVector2(a.X - b.X, a.Y - b.Y);
 }
 
-// TODO Document
 csmVector2 MultiplyVector2(csmVector2 a, csmVector2 b)
 {
   return MakeVector2(a.X * b.X, a.Y * b.Y);
 }
 
-// TODO Document
 csmVector2 MultiplyVectoy2ByScalar(csmVector2 v, float s)
 {
   return MakeVector2(v.X * s, v.Y * s);
 }
 
-// TODO Document
 csmVector2 DivideVector2(csmVector2 a, csmVector2 b)
 {
   return MakeVector2(a.X / b.X, a.Y / b.Y);
 }
 
-// TODO Document
 csmVector2 DivideVector2ByScalar(csmVector2 v, float s)
 {
   return MakeVector2(v.X / s, v.Y / s);
 }
 
-// TODO Document
 float Distance(csmVector2 a, csmVector2 b)
 {
   return Length(SubVector2(a, b));
 }
 
-// TODO Document
 void Normalize(csmVector2* target)
 {
   float length;
@@ -114,19 +149,16 @@ void Normalize(csmVector2* target)
   target->Y = target->Y / length;
 }
 
-// TODO Document
 float DegreesToRadian(float degrees)
 {
   return (degrees / 180.0f) * PI;
 }
 
-// TODO Document
 float RadianToDegrees(float radian)
 {
   return (radian * 180.0f) / PI;
 }
 
-// TODO Document
 float DirectionToRadian(csmVector2 from, csmVector2 to)
 {
   float dotProduct;
@@ -155,7 +187,6 @@ float DirectionToRadian(csmVector2 from, csmVector2 to)
   return theta;
 }
 
-// TODO Document
 float DirectionToDegrees(csmVector2 from, csmVector2 to)
 {
   float radian;
@@ -174,7 +205,6 @@ float DirectionToDegrees(csmVector2 from, csmVector2 to)
   return degree;
 }
 
-// TODO Document
 csmVector2 RadianToDirection(float totalAngle)
 {
   csmVector2 ret;
@@ -187,7 +217,6 @@ csmVector2 RadianToDirection(float totalAngle)
   return ret;
 }
 
-// TODO Document
 float NormalizeParameterValue(
   float value,
   float parameterMinimum,

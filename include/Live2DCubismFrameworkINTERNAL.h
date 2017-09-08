@@ -200,83 +200,120 @@ enum
   csmParameterPhysics,
 };
 
-// TODO Document
+/// Component of source physical force.
 enum
 {
+  /// Use X-axis position.
   csmSourceXPhysics,
-  
+
+  /// Use Y-axis position.
   csmSourceYPhysics,
 
+  /// Use angle.
   csmSourceAnglePhysics,
 };
 
-// TODO Document
+/// Physics Input / Output parameter.
 typedef struct csmPhysicsParameter
 {
+  /// Parameter id.
   csmHash Id;
 
+  /// Type of target parameter.
   short TargetType;
 }
 csmPhysicsParameter;
 
-// TODO Document
+/// Normalization values.
 typedef struct csmPhysicsNormalization
 {
+  /// Normalized minimum value.
   float Minimum;
-  
+
+  /// Normalized maximum value.
   float Maximum;
 
+  /// Normalized default value.
   float Default;
 }
 csmPhysicsNormalization;
 
-// TODO Document
+/// Particle.
 typedef struct csmPhysicsParticle
 {
+  /// Initial position.
   csmVector2 InitialPosition;
 
+  /// Mobility ratio.
   float Mobility;
 
+  /// Delay ratio.
   float Delay;
 
+  /// Current acceleration.
   float Acceleration;
 
+  /// Length of radius.
   float Radius;
 
+  /// Current position.
   csmVector2 Position;
 
+  /// Last position.
   csmVector2 LastPosition;
 
+  /// Last gravity.
   csmVector2 LastGravity;
 
+  /// Current force.
   csmVector2 Force;
 
+  /// Current velocity.
   csmVector2 Velocity;
 }
 csmPhysicsParticle;
 
-// TODO Document
+/// Children of rig.
 typedef struct csmPhysicsSubRig
 {
+  /// Number of input.
   int InputCount;
 
+  /// Number of output.
   int OutputCount;
 
+  /// Number of particle.
   int ParticleCount;
 
+  /// Index of first input in this rig.
   int BaseInputIndex;
 
+  /// Index of first output in this rig.
   int BaseOutputIndex;
 
+  /// Index of first particle in this rig.
   int BaseParticleIndex;
 
+  /// Normalized position values.
   csmPhysicsNormalization NormalizationPosition;
 
+  /// Normalized angle values.
   csmPhysicsNormalization NormalizationAngle;
 }
 csmPhysicsSubRig;
 
-// TODO Document
+/// Delegation of function of getting normalized parameter value.
+///
+/// @param  targetTranslation      Result of translation.
+/// @param  targetAngle            Result of rotation.
+/// @param  value                  Current parameter value.
+/// @param  parameterMinimumValue  Minimum parameter value.
+/// @param  parameterMaximumValue  Maximum parameter value.
+/// @param  parameterDefaultValue  Default parameter value.
+/// @param  normalizationPosition  Normalized position value.
+/// @param  normalizationAngle     Normalized angle value.
+/// @param  isInverted             True if value is inverted; othewise.
+/// @param  weight                 Weight.
 typedef void(*NormalizedPhysicsParameterValueGetter)(
   csmVector2* targetTranslation,
   float* targetAngle,
@@ -290,24 +327,36 @@ typedef void(*NormalizedPhysicsParameterValueGetter)(
   float weight
   );
 
-// TODO Document
+/// Input data of physics.
 typedef struct csmPhysicsInput
 {
+  /// Source of parameter.
   csmPhysicsParameter Source;
 
+  /// Index of source parameter.
   int SourceParameterIndex;
 
+  /// Weight.
   float Weight;
 
+  /// Component of source.
   short Type;
 
+  /// True if value is inverted; othewise.
   short Reflect;
 
+  /// Function of getting normalized parameter value.
   NormalizedPhysicsParameterValueGetter GetNormalizedParameterValue;
 }
 csmPhysicsInput;
 
-// TODO Document
+/// Delegation of function of getting output value.
+///
+/// @param  translation    Translation.
+/// @param  particles      Particles.
+/// @param  particleIndex  Index of particle.
+/// @param  isInverted     True if value is inverted; othewise.
+/// @param  parentGravity  Gravity.
 typedef float(*PhysicsValueGetter)(
   csmVector2 translation,
   csmPhysicsParticle* particles,
@@ -316,53 +365,75 @@ typedef float(*PhysicsValueGetter)(
   csmVector2 parentGravity
   );
 
-// TODO Document
+/// Delegation of function of getting output scale.
+///
+/// @param  translationScale  Scale of transition.
+/// @param  angleScale        Scale of angle.
 typedef float(*PhysicsScaleGetter)(csmVector2 translationScale, float angleScale);
 
-// TODO Document
+/// Output data of physics.
 typedef struct csmPhysicsOutput
 {
+  /// Destination of parameter.
   csmPhysicsParameter Destination;
 
+  /// Index of destination parameter.
   int DestinationParameterIndex;
 
+  /// Index of particle.
   int VertexIndex;
 
+  /// Scale of translation.
   csmVector2 TranslationScale;
 
+  /// Scale of angle.
   float AngleScale;
 
+  /// Weight.
   float Weight;
 
+  /// Component of source.
   short Type;
 
+  /// True if value is inverted; othewise.
   short Reflect;
 
+  /// The value that below minimum.
   float ValueBelowMinimum;
 
+  /// The value that exceeds maximum.
   float ValueExceededMaximum;
 
+  /// Function of getting output value.
   PhysicsValueGetter GetValue;
 
+  /// Function of getting output scale.
   PhysicsScaleGetter GetScale;
 }
 csmPhysicsOutput;
 
-// TODO Document
+/// Physics rig.
 typedef struct csmPhysicsRig
 {
+  /// Count of children rig.
   int SubRigCount;
 
+  /// Array of sub rig.
   csmPhysicsSubRig* Settings;
 
+  /// Array of input.
   csmPhysicsInput* Inputs;
 
+  /// Array of output.
   csmPhysicsOutput* Outputs;
 
+  /// Array of particle.
   csmPhysicsParticle* Particles;
 
+  /// Gravity.
   csmVector2 Gravity;
 
+  /// Direction of wind.
   csmVector2 Wind;
 }
 csmPhysicsRig;
