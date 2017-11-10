@@ -217,83 +217,91 @@ csmVector2 RadianToDirection(float totalAngle)
   return ret;
 }
 
+float GetRangeValue(float min, float max)
+{
+  float maxValue = Max(min, max);
+  float minValue = Min(min, max);
+  return (float)fabs(maxValue - minValue);
+}
+
+float GetDefaultValue(float min, float max)
+{
+  float minValue = Min(min, max);
+  return minValue + (GetRangeValue(min, max) / 2.0f);
+}
+
 float NormalizeParameterValue(
   float value,
   float parameterMinimum,
   float parameterMaximum,
   float parameterDefault,
-  float NormalizedMinimum,
-  float NormalizedMaximum,
-  float NormalizedDefault,
+  float normalizedMinimum,
+  float normalizedMaximum,
+  float normalizedDefault,
   int isInverted)
 {
+  float result = 0.0f;
 
-  float result;
-  float minimumValue;
-  float maximumValue;
-  float defaultValue;
-  float parameterValue;
-  float parameterRange;
-  float normalizedRange;
+  float maxValue = Max(parameterMaximum, parameterMinimum);
 
-  result = 0.0f;
-  maximumValue = Max(parameterMaximum, parameterMinimum);
-  minimumValue = Min(parameterMaximum, parameterMinimum);
-  defaultValue = parameterDefault;
-  parameterValue = value - defaultValue;
+  if (maxValue < value)
+  {
+    return result;
+  }
 
-  switch (Sign(parameterValue))
+  float minValue = Min(parameterMaximum, parameterMinimum);
+
+  if (minValue > value)
+  {
+    return result;
+  }
+
+  float minNormValue = Min(normalizedMinimum, normalizedMaximum);
+  float maxNormValue = Max(normalizedMinimum, normalizedMaximum);
+  float middleNormValue = normalizedDefault;
+
+  float middleValue = GetDefaultValue(minValue, maxValue);
+  float paramValue = value - middleValue;
+
+  switch (Sign(paramValue))
   {
     case 1:
     {
-      parameterRange = maximumValue - defaultValue;
-
-      if (parameterRange == 0.0f)
+      float nLength = maxNormValue - middleNormValue;
+      float pLength = maxValue - middleValue;
+      if (pLength != 0.0f)
       {
-        return NormalizedDefault;
-      }
-
-      normalizedRange = NormalizedMaximum - NormalizedDefault;
-
-      if (normalizedRange == 0.0f)
-      {
-        return NormalizedMaximum;
+        result = paramValue*(nLength / pLength);
+        result += middleNormValue;
       }
 
 
-      result = value * (float)fabs(normalizedRange / parameterRange);
+      break;
     }
-    break;
     case -1:
     {
-      parameterRange = defaultValue - minimumValue;
-
-      if (parameterRange == 0.0f)
+      float nLength = minNormValue - middleNormValue;
+      float pLength = minValue - middleValue;
+      if (pLength != 0.0f)
       {
-        return NormalizedDefault;
-      }
-
-      normalizedRange = NormalizedDefault - NormalizedMinimum;
-
-      if (normalizedRange == 0.0f)
-      {
-        return NormalizedMinimum;
+        result = paramValue*(nLength / pLength);
+        result += middleNormValue;
       }
 
 
-      result = value * (float)fabs(normalizedRange / parameterRange);
+      break;
     }
-    break;
     case 0:
     {
-      result = NormalizedDefault;
+      result = middleNormValue;
+
+
+      break;
     }
-    break;
   }
 
-
   return (isInverted)
-    ? result
-    : (result * -1.0f);
+          ? result
+          : (result * -1.0f);
 }
 

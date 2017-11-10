@@ -273,6 +273,22 @@ float DirectionToDegrees(csmVector2 from, csmVector2 to);
 /// @return  Vector direction from radians angle.
 csmVector2 RadianToDirection(float totalAngle);
 
+/// Gets middle value.
+///
+/// @param  min   Minimum value.
+/// @param  max   Maximum value.
+///
+/// @return 
+float GetRangeValue(float min, float max);
+
+/// Gets default value.
+///
+/// @param  min   Minimum value.
+/// @param  max   Maximum value.
+///
+/// @return 
+float GetDefaultValue(float min, float max);
+
 /// Gets normalized value from parameter value.
 ///
 /// @param  value  Target value.
