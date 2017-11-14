@@ -180,20 +180,14 @@ static void UpdateParticles(
 
 
     direction =  SubVector2(strand[i].Position, strand[i - 1].Position);
-    distance = Distance(MakeVector2(0.0f, 0.0f), direction);
-    angle = DirectionToDegrees(strand[i].LastGravity, currentGravity);
-    radian = DegreesToRadian(angle);
-
-
-    radian /= AirResistance;
+    radian = DirectionToRadian(strand[i].LastGravity, currentGravity) / AirResistance;
 
 
     direction.X = (((float)cos(radian) * direction.X) - (direction.Y * (float)sin(radian)));
     direction.Y = (((float)sin(radian) * direction.X) + (direction.Y * (float)cos(radian)));
-    Normalize(&direction);
 
 
-    strand[i].Position = AddVector2(strand[i - 1].Position, MultiplyVectoy2ByScalar(direction, distance));
+    strand[i].Position = AddVector2(strand[i - 1].Position, direction);
 
 
     velocity = MultiplyVectoy2ByScalar(strand[i].Velocity, delay);
@@ -220,10 +214,6 @@ static void UpdateParticles(
     {
       strand[i].Velocity =
         MultiplyVectoy2ByScalar(DivideVector2ByScalar(SubVector2(strand[i].Position, strand[i].LastPosition), delay), strand[i].Mobility);
-    }
-    else
-    {
-      strand[i].Velocity = MakeVector2(0.0f, 0.0f);
     }
 
 
@@ -267,7 +257,6 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
   float totalAngle;
   float weight;
   float radAngle;
-  float translationX, translationY;
   float outputValue;
   csmVector2 totalTranslation;
   int i, settingIndex, particleIndex;
@@ -328,11 +317,8 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
 
     radAngle = DegreesToRadian(-totalAngle);
 
-    translationX = totalTranslation.X;
-    translationY = totalTranslation.Y;
-
-    totalTranslation.X = (translationX * (float)cos(radAngle) - translationY * (float)sin(radAngle));
-    totalTranslation.Y = (translationX * (float)sin(radAngle) + translationY * (float)cos(radAngle));
+    totalTranslation.X = (totalTranslation.X * (float)cos(radAngle) - totalTranslation.Y * (float)sin(radAngle));
+    totalTranslation.Y = (totalTranslation.X * (float)sin(radAngle) + totalTranslation.Y * (float)cos(radAngle));
 
 
     // Calculate particles position.
@@ -362,7 +348,7 @@ void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptio
         currentOutput[i].DestinationParameterIndex = csmFindParameterIndexByHash(model, currentOutput[i].Destination.Id);
       }
 
-      csmVector2 translation = SubVector2(currentParticles[particleIndex - 1].Position, currentParticles[particleIndex].Position);
+      csmVector2 translation = SubVector2(currentParticles[particleIndex].Position, currentParticles[particleIndex - 1].Position);
 
       outputValue = currentOutput[i].GetValue(
         translation,

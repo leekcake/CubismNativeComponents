@@ -161,30 +161,30 @@ float RadianToDegrees(float radian)
 
 float DirectionToRadian(csmVector2 from, csmVector2 to)
 {
-  float dotProduct;
-  float magnitude;
+  float q1;
+  float q2;
+  float ret;
+
+  
+  q1 = atan2(to.Y, to.X);
+  q2 = atan2(from.Y, from.X);
 
 
-  dotProduct = Dot(from, to);
-  magnitude = Length(from) * Length(to);
+  ret = q1 - q2;
 
-  if (magnitude == 0.0f)
+
+  while (ret < -PI)
   {
-    return 0.0f;
+    ret += PI * 2.0f;
+  }
+  
+  while (ret > PI)
+  {
+    ret -= PI * 2.0f;
   }
 
 
-  float cosTheta = (dotProduct / magnitude);
-
-  if (fabs(cosTheta) > 1.0)
-  {
-    return 0.0f;
-  }
-
-
-  float theta = (float)acos(cosTheta);
-
-  return theta;
+  return ret;
 }
 
 float DirectionToDegrees(csmVector2 from, csmVector2 to)

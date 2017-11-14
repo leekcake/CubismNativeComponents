@@ -361,21 +361,27 @@ static float GetOutputAngle(
   csmVector2 parentGravity
 )
 {
-  parentGravity = MultiplyVectoy2ByScalar(parentGravity, -1.0f);
+  float outputValue;
 
-  translation.Y *= -1.0f;
 
-  float outputValue = DirectionToRadian(MultiplyVectoy2ByScalar(parentGravity, -1.0f), MultiplyVectoy2ByScalar(translation, -1.0f));
+  if (particleIndex >= 2)
+  {
+    parentGravity = SubVector2(particles[particleIndex - 1].Position, particles[particleIndex - 2].Position);
+  }
+  else
+  {
+    parentGravity = MultiplyVectoy2ByScalar(parentGravity, -1.0f);
+  }
 
-  outputValue = (((-translation.X) - (-parentGravity.X)) > 0.0f)
-    ? -outputValue
-    : outputValue;
+
+  outputValue = DirectionToRadian(parentGravity, translation);
 
 
   if (isInverted)
   {
     outputValue *= -1.0f;
   }
+
 
   return outputValue;
 }
