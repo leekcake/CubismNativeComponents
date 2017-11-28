@@ -155,8 +155,6 @@ static void UpdateParticles(
   int i;
   float totalRadian;
   float delay;
-  float distance;
-  float angle;
   float radian;
   csmVector2 currentGravity;
   csmVector2 direction;

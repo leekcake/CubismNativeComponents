@@ -786,7 +786,6 @@ static int ParsePhysics3(const char* jsonString, csmJsonTokenType type, int begi
 {
   MetaParserContext metaParserContext;
   PhysicsParserContext* context;
-  int segmentType;
 
 
   // Recover context.

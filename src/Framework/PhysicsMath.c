@@ -166,8 +166,8 @@ float DirectionToRadian(csmVector2 from, csmVector2 to)
   float ret;
 
   
-  q1 = atan2(to.Y, to.X);
-  q2 = atan2(from.Y, from.X);
+  q1 = (float)atan2(to.Y, to.X);
+  q2 = (float)atan2(from.Y, from.X);
 
 
   ret = q1 - q2;
