@@ -90,7 +90,7 @@ void csmLexJson(const char* jsonString, csmJsonTokenHandler onToken, void* userD
         tokenBegin = (int)(string - base) + 1;
         
 
-        for (++string; *string != '"'; ++string)
+        for (++string; (*string != '"') || ((*(string - 1) == '\\') && (*string == '"')); ++string)
         {
           ;
         }

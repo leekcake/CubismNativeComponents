@@ -47,6 +47,8 @@ typedef enum ParserState
   /// Common flag signalizing parser is waiting for something...
   Waiting,
 
+  WaitingUserData,
+
   /// Common flag signaling parsing has finished.
   FinishedParsing,
 
@@ -76,6 +78,10 @@ typedef enum ParserState
   /// Flag for meta parser to read bezier restriction.
   ReadingAreBeziersRestricted,
 
+  ReadingUserDataCount,
+
+  ReadingTotalUserDataSize,
+
 
   // Flag for motion parser to read single curve data.
   ReadingCurve,
@@ -88,6 +94,13 @@ typedef enum ParserState
 
   // Flag for motion parser to read curve segments data.
   ReadingSegments,
+
+
+  ReadingUserData,
+
+  ReadingTime,
+
+  ReadingValue,
 }
 ParserState;
 
@@ -131,6 +144,9 @@ typedef struct MotionParserContext
   /// Current offset into buffer points array.
   int PointIndex;
 
+  /// Current offset into buffer user data array.
+  int UserDataIndex;
+
 
   /// Position in segment being parsed.
   int SegmentValueIndex;
@@ -140,6 +156,9 @@ typedef struct MotionParserContext
 
   /// Non-zero if point time should be parsed. 
   int ReadPointTime;
+
+  /// TODO Document
+  int UserDataValueIndex;
 
 
   /// Motion meta data.
@@ -240,6 +259,8 @@ static void InitializeMetaParserContext(MetaParserContext* context, MotionJsonMe
   context->State = Pending;
   context->Buffer = buffer;
   context->Buffer->AreBeziersRestricted = 0;
+  context->Buffer->UserDataCount = 0;
+  context->Buffer->TotalUserDataSize = 0;
 }
 
 
@@ -256,11 +277,14 @@ static void InitializeMotionParserContext(MotionParserContext* context, csmAnima
   context->SegmentValueIndex = 0;
   context->SegmentTypePosition = 0;
   context->ReadPointTime = 0;
+  context->UserDataIndex = 0;
+  context->UserDataValueIndex = 0;
   context->Buffer = buffer;
 
 
   // 'Flag' buffer as uninitialized...
   context->Buffer->Curves = 0;
+  context->Buffer->UserData = 0;
 }
 
 
@@ -343,6 +367,14 @@ static int ParseMeta3(const char* jsonString, csmJsonTokenType type, int begin, 
         else if (DoesStringStartWith(jsonString + begin, "TotalPointCount"))
         {
           context->State = ReadingTotalPointCount;
+        }
+        else if (DoesStringStartWith(jsonString + begin, "UserDataCount"))
+        {
+          context->State = ReadingUserDataCount;
+        }
+        else if (DoesStringStartWith(jsonString + begin, "TotalUserDataSize"))
+        {
+          context->State = ReadingTotalUserDataSize;
         }
         else if (DoesStringStartWith(jsonString + begin, "AreBeziersRestricted"))
         {
@@ -432,6 +464,35 @@ static int ParseMeta3(const char* jsonString, csmJsonTokenType type, int begin, 
       break;
     }
 
+    
+    // Read number of user data.
+    case ReadingUserDataCount:
+    {
+      ReadIntFromString(jsonString + begin, &context->Buffer->UserDataCount);
+
+
+      context->State = Waiting;
+
+
+      break;
+    }
+
+
+    // Read total user data size.
+    case ReadingTotalUserDataSize:
+    {
+      ReadIntFromString(jsonString + begin, &context->Buffer->TotalUserDataSize);
+
+
+      context->Buffer->TotalUserDataSize += context->Buffer->UserDataCount;
+
+
+      context->State = Waiting;
+
+
+      break;
+    }
+
 
     // Read bézier restriction.
     case ReadingAreBeziersRestricted:
@@ -470,6 +531,8 @@ static int ParseMotion3(const char* jsonString, csmJsonTokenType type, int begin
   MetaParserContext metaParserContext;
   MotionParserContext* context;
   int segmentType;
+  int escaped;
+  int i;
 
 
   // Recover context.
@@ -489,12 +552,17 @@ static int ParseMotion3(const char* jsonString, csmJsonTokenType type, int begin
     context->Buffer->Loop = (short)context->Meta.Loop;
 
     context->Buffer->CurveCount = (short)context->Meta.CurveCount;
+    context->Buffer->UserDataCount = context->Meta.UserDataCount;
 
 
     // Initialize pointer fields.
     context->Buffer->Curves = (csmAnimationCurve*)(context->Buffer + 1);
     context->Buffer->Segments = (csmAnimationSegment*)(context->Buffer->Curves + context->Meta.CurveCount);
     context->Buffer->Points = (csmAnimationPoint*)(context->Buffer->Segments + context->Meta.TotalSegmentCount);
+    
+
+    context->Buffer->UserData = (csmAnimationUserData*)(context->Buffer->Points + context->Meta.TotalPointCount);
+    context->Buffer->UserDataValues = (char*)(context->Buffer->UserData + context->Meta.UserDataCount);
   }
 
 
@@ -515,6 +583,14 @@ static int ParseMotion3(const char* jsonString, csmJsonTokenType type, int begin
       {
         context->State = Waiting;
       }
+      else if (DoesStringStartWith(jsonString + begin, "UserDataCount"))
+      {
+        ;
+      }
+      else if (DoesStringStartWith(jsonString + begin, "UserData"))
+      {
+        context->State = WaitingUserData;
+      }
 
 
       break;
@@ -527,7 +603,7 @@ static int ParseMotion3(const char* jsonString, csmJsonTokenType type, int begin
       // Stop parsing at last curve.
       if (type == csmJsonArrayEnd)
       {
-        context->State = FinishedParsing;
+        context->State = Pending;
       }
 
 
@@ -545,6 +621,157 @@ static int ParseMotion3(const char* jsonString, csmJsonTokenType type, int begin
 
       break;
     }
+
+
+    case WaitingUserData:
+    {
+      if (type == csmJsonArrayEnd)
+      {
+        context->State = Pending;
+      }
+
+
+      else
+      {
+        context->Buffer->UserData[context->UserDataIndex].BaseValueIndex = context->UserDataValueIndex;
+
+
+        context->State = ReadingUserData;
+      }
+
+
+      break;
+    }
+
+
+    case ReadingUserData:
+    {
+      if (type == csmJsonObjectEnd)
+      {
+        context->Buffer->UserData[context->UserDataIndex].ValueCount = context->UserDataValueIndex - context->Buffer->UserData[context->UserDataIndex].BaseValueIndex;
+
+
+        // Update context.
+        context->UserDataIndex += 1;
+
+        context->State = WaitingUserData;
+      }
+
+
+      // Prepare context for reading curve data.
+      else
+      {
+        if (DoesStringStartWith(jsonString + begin, "Time"))
+        {
+          context->State = ReadingTime;
+        }
+        else if (DoesStringStartWith(jsonString + begin, "Value"))
+        {
+          context->State = ReadingValue;
+        }
+      }
+
+
+      break;
+    }
+
+
+      // Read curve id.
+    case ReadingTime:
+    {
+      // Hash ID..
+      ReadFloatFromString(jsonString + begin, &context->Buffer->UserData[context->UserDataIndex].Time);
+
+
+      // Allow parsing of other curve data.
+      context->State = ReadingUserData;
+
+
+      break;
+    }
+
+
+    // Read curve segments.
+    case ReadingValue:
+    {
+      escaped = 0;
+
+
+      for (i = begin; i < end; ++i)
+      {
+        if (escaped)
+        {
+          switch (jsonString[i])
+          {
+            case 't':
+            {
+              context->Buffer->UserDataValues[context->UserDataValueIndex] = '\t';
+
+              break;
+            }
+
+
+            case 'r':
+            {
+              context->Buffer->UserDataValues[context->UserDataValueIndex] = '\r';
+
+
+              break;
+            }
+
+
+            case 'n':
+            {
+              context->Buffer->UserDataValues[context->UserDataValueIndex] = '\n';
+
+
+              break;
+            }
+
+            case '\"':
+            case '\\':
+            {
+              context->Buffer->UserDataValues[context->UserDataValueIndex] = jsonString[i];
+
+
+              break;
+            }
+
+
+            default:
+            {
+              break;
+            }
+          }
+
+
+          escaped = 0;
+          context->UserDataValueIndex += 1;
+        }
+        else
+        {
+          escaped |= jsonString[i] == '\\' ? 1 : 0;
+
+
+          if (!escaped)
+          {
+            context->Buffer->UserDataValues[context->UserDataValueIndex] = jsonString[i];
+            context->UserDataValueIndex += 1;
+          }
+        }
+      }
+
+      context->Buffer->UserDataValues[context->UserDataValueIndex] = 0;
+      context->UserDataValueIndex += 1;
+
+
+      // Allow parsing of other curve data.
+      context->State = ReadingUserData;
+
+
+      break;
+    }
+
 
 
     // Handle parsing of a single curve.

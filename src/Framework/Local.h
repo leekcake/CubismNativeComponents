@@ -51,6 +51,12 @@ typedef struct MotionJsonMeta
   /// Total number of points motion contains.
   int TotalPointCount;
 
+  /// Total number of UserData.
+  int UserDataCount;
+
+  /// Total size of UserData in bytes.
+  int TotalUserDataSize;
+
 
   /// Non-zero if béziers are restricted; '0' otherwise.
   int AreBeziersRestricted;
@@ -80,6 +86,17 @@ typedef struct PhysicsJsonMeta
   PhysicsJsonEffectiveForces EffectiveForces;
 }
 PhysicsJsonMeta;
+
+/// Meta data of a serialized motion.
+typedef struct UserDataJsonMeta
+{
+  /// Total number of user data.
+  int UserDataCount;
+
+  /// Total size of user data.
+  int TotalUserDataSize;
+}
+UserDataJsonMeta;
 
 
 // ---------- //
@@ -161,6 +178,23 @@ void ReadPhysicsJsonMeta(const char* physicsJson, PhysicsJsonMeta* buffer);
 /// @param  physicsJson  Physics JSON string.
 /// @param  buffer       Buffer to read into.
 void ReadPhysicsJson(const char* physicsJson, csmPhysicsRig* buffer);
+
+
+// ------------- //
+// USERDATA JSON //
+// ------------- //
+
+/// Reads serialized user data meta.
+///
+/// @param  userData3Json  User data JSON string.
+/// @param  buffer         Buffer to read into.
+void ReadUserDataJsonMeta(const char* userData3Json, UserDataJsonMeta* buffer);
+
+/// Reads a serialized user data.
+///
+/// @param  userData3Json  User data JSON string.
+/// @param  buffer         Buffer to read into.
+void ReadUserDataJson(const char* userData3Json, csmUserData* buffer);
 
 
 // ------------ //

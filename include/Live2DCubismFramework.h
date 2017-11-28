@@ -126,6 +126,53 @@ typedef struct csmPhysicsOptions
 }
 csmPhysicsOptions;
 
+// --------- //
+// USER DATA //
+// --------- //
+
+/// TODO Document
+typedef struct csmUserData csmUserData;
+
+/// TODO Document
+typedef struct csmAnimationUserData csmAnimationUserData;
+
+/// TODO Document
+typedef void(*csmAnimationUserDataCallback)(float, const char*);
+
+
+/// TODO Document
+typedef struct csmUserDataSink
+{
+  /// TODO Document
+  csmHash Id;
+
+  /// TODO Document
+  const char* Value;
+}
+csmUserDataSink;
+
+/// TODO Document
+typedef struct csmAnimationUserDataSink
+{
+  /// TODO Document
+  float Time;
+
+  /// TODO Document
+  const char* Value;
+}
+csmAnimationUserDataSink;
+
+/// TODO Document
+typedef struct csmAnimationUserDataCallbackState
+{
+  /// TODO Document
+  csmAnimationUserDataCallback CallbackFunction;
+
+  /// TODO Document
+  float LastTime;
+}
+csmAnimationUserDataCallbackState;
+
 
 // ---------------- //
 // MODEL EXTENSIONS //
@@ -295,3 +342,33 @@ csmPhysicsRig *csmDeserializePhysicsInPlace(const char *physicsJson, void* addre
 /// @param  physics  Physics to evaluate.
 /// @param  options  Options of evaluation.
 void csmPhysicsEvaluate(csmModel* model, csmPhysicsRig* physics, csmPhysicsOptions* options, float deltaTime);
+
+
+// --------- //
+// USER DATA //
+// --------- //
+
+///
+unsigned int csmGetDeserializedSizeofUserData(const char* userDataJson);
+
+
+///
+csmUserData* csmDeserializeUserDataInPlace(const char *userDataJson, void* address, const unsigned int size);
+
+/// 
+int csmGetUserDataCount(const csmUserData* userData);
+
+/// 
+void csmGetUserData(const csmUserData* userData, int index, csmUserDataSink* destination);
+
+/// 
+int csmGetAnimationUserDataCount(const csmAnimation* animation);
+
+/// 
+void csmGetAnimationUserData(const csmAnimation* animation, int index, csmAnimationUserDataSink* destination);
+
+/// 
+void csmInitializeAnimationUserDataCallback(csmAnimationUserDataCallbackState *state, csmAnimationUserDataCallback callbackFunction);
+
+/// 
+void csmUpdateAnimationUserDataCallbackUpdate(csmAnimationUserDataCallbackState *state, const csmAnimationState* animationState, const csmAnimation* animation);

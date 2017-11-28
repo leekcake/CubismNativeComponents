@@ -113,6 +113,7 @@ set (_CSM_COMPONENTS_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Animation.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/AnimationSegmentEvaluationFunction.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/AnimationState.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/AnimationUserDataCallback.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/FloatBlendFunction.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Json.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/ModelExtensions.c
@@ -120,7 +121,9 @@ set (_CSM_COMPONENTS_SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/String.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/PhysicsMath.c
   ${CMAKE_CURRENT_LIST_DIR}/src/Framework/PhysicsJson.c
-  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Physics.c)
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/Physics.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/UserData.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/Framework/UserDataJson.c)
 
 
 if (_CSM_COMPONENTS_BUILD_GL_RENDERER)

@@ -165,6 +165,21 @@ typedef struct csmAnimationCurve
 csmAnimationCurve;
 
 
+/// User data.
+typedef struct csmAnimationUserData
+{
+  /// Position of time.
+  float Time;
+  
+  /// Number of value.
+  int ValueCount;
+
+  /// Index of first value.
+  int BaseValueIndex;
+}
+csmAnimationUserData;
+
+
 /// Animation.
 typedef struct csmAnimation
 {
@@ -178,6 +193,9 @@ typedef struct csmAnimation
   /// Number of curves.
   short CurveCount;
 
+  /// Number of user data.
+  int UserDataCount;
+
   /// Curves.
   csmAnimationCurve* Curves;
 
@@ -186,6 +204,12 @@ typedef struct csmAnimation
 
   /// Curve points.
   csmAnimationPoint* Points;
+
+  /// User data.
+  csmAnimationUserData* UserData;
+
+  /// User data values.
+  char* UserDataValues;
 }
 csmAnimation;
 
@@ -437,6 +461,49 @@ typedef struct csmPhysicsRig
   csmVector2 Wind;
 }
 csmPhysicsRig;
+
+
+// --------- //
+// USER DATA //
+// --------- //
+
+/// Type of target.
+enum
+{
+  csmArtMeshUserData,
+};
+
+/// User data tag data.
+typedef struct csmUserDataTag
+{
+  /// User data target type.
+  short Type;
+
+  /// Id of target.
+  csmHash Id;
+
+  /// Number of value.
+  int ValueCount;
+
+  /// Index of first element in value.
+  int BaseValueIndex;
+}
+csmUserDataTag;
+
+typedef struct csmUserData
+{
+  /// Number of tag.
+  int TagCount;
+
+  /// Tags.
+  csmUserDataTag* Tags;
+
+
+  /// Values.
+  char* Values;
+}
+csmUserData;
+
 
 
 // ---------------- //

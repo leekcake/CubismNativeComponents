@@ -82,7 +82,9 @@ unsigned int csmGetDeserializedSizeofAnimation(const char* motionJson)
   return (unsigned int)(sizeof(csmAnimation)
     + (sizeof(csmAnimationCurve) * meta.CurveCount)
     + (sizeof(csmAnimationSegment) * meta.TotalSegmentCount)
-    + (sizeof(csmAnimationPoint) * meta.TotalPointCount));
+    + (sizeof(csmAnimationPoint) * meta.TotalPointCount)
+    + (sizeof(csmAnimationUserData) * meta.UserDataCount)
+    + (sizeof(char) * meta.TotalUserDataSize));
 }
 
 
