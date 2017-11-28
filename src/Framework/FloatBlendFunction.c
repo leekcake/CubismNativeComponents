@@ -15,7 +15,7 @@
 
 float csmOverrideFloatBlendFunction(float base, float value, float weight)
 {
-  return value * weight;
+  return (value  * weight) + (base * (1.0f - weight));
 }
 
 float csmAdditiveFloatBlendFunction(float base, float value, float weight)
