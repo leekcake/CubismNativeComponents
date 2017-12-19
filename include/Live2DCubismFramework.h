@@ -63,14 +63,14 @@ csmModelHashTable;
 /// @param  weight  Blend weight to use.
 ///
 /// @return Blend result.
-typedef float (*csmFloatBlendFunction)(float base, float value, float weight);
+typedef float (*csmFloatBlendFunction)(float base, float value, float firstFrameValue, float weight);
 
 
 /// Builtin override float blend function.
-float csmOverrideFloatBlendFunction(float base, float value, float weight);
+float csmOverrideFloatBlendFunction(float base, float value, float firstFrameValue, float weight);
 
 /// Builtin additive float blend function.
-float csmAdditiveFloatBlendFunction(float base, float value, float weight);
+float csmAdditiveFloatBlendFunction(float base, float value, float firstFrameValue, float weight);
 
 
 /// Opaque Cubism animation.
