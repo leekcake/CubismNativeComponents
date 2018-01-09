@@ -254,9 +254,6 @@ static int ParseMeta3(const char* jsonString, csmJsonTokenType type, int begin, 
   {
     ReadIntFromString(jsonString + begin, &context->Buffer->UserDataCount);
 
-    // Consider null-terminator bytes.
-    context->Buffer->TotalUserDataSize += context->Buffer->UserDataCount;
-
     context->State = Waiting;
 
 
@@ -269,6 +266,7 @@ static int ParseMeta3(const char* jsonString, csmJsonTokenType type, int begin, 
   {
     ReadIntFromString(jsonString + begin, &context->Buffer->TotalUserDataSize);
 
+    context->Buffer->TotalUserDataSize += context->Buffer->UserDataCount;
 
     context->State = Waiting;
 
