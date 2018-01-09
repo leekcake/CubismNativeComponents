@@ -1,0 +1,19 @@
+{
+	"Version": 3,
+	"Meta": {
+		"UserDataCount": 2,
+		"TotalUserDataSize": 9
+	},
+	"UserData": [
+		{
+			"Target": "ArtMesh",
+			"Id": "Mouth3",
+			"Value": "tooth"
+		},
+		{
+			"Target": "ArtMesh",
+			"Id": "Face",
+			"Value": "face"
+		}
+	]
+}
