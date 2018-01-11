@@ -43,10 +43,19 @@ static struct
 
   csmGlRenderer* Renderer;
 
-  GLuint Texture;
+  GLuint* Textures;
 }
 Sample;
 
+static const char* TexturePathes[] =
+{
+  "Mark/Mark.png",
+};
+
+static int GetTextureCount()
+{
+  return sizeof(TexturePathes) / sizeof(const char*);
+}
 
 const char* GetSampleTitle()
 {
@@ -66,7 +75,7 @@ void Callback(float time, const char* value)
 void OnDidStart()
 {
   void* mocMemory, * modelMemory, * tableMemory, * motionJsonMemory, * animationMemory, * rendererMemory;
-  unsigned int mocSize, modelSize, tableSize, animationSize, rendererSize;
+  unsigned int mocSize, modelSize, tableSize, animationSize, rendererSize, textureArraySize;
 
   void* userDataJsonMemory, * userDataMemory, * physicsJsonMemory, * physicsMemory;
   unsigned int userDataSize, physicsSize;
@@ -75,6 +84,8 @@ void OnDidStart()
 
   csmUserDataSink userDataSink;
   csmAnimationUserDataSink animationSink;
+
+  int textureCount;
 
   int i;
 
@@ -175,7 +186,16 @@ void OnDidStart()
 
 
   // Load texture.
-  Sample.Texture = LoadTextureFromPng("Mark/Mark.png");
+  textureCount = GetTextureCount();
+  textureArraySize = csmGetSizeofTextureArray(textureCount);
+
+
+  Sample.Textures = Allocate(textureArraySize);
+
+  for (i = 0; i < textureCount; ++i)
+  {
+    Sample.Textures[i] = LoadTextureFromPng(TexturePathes[i]);
+  }
 }
 
 
@@ -227,14 +247,20 @@ void OnTick(float deltaTime)
 
 
   // Draw.
-  csmGlDraw(Sample.Renderer, GetViewProjectionMatrix(), &Sample.Texture);
+  csmGlDraw(Sample.Renderer, GetViewProjectionMatrix(), Sample.Textures);
 }
 
 
 void OnWillQuit()
 {
-  // Release resources.
-  ReleaseTexture(Sample.Texture);
+  int i;
+
+
+  // Release resources.  
+  for (i = 0; i < GetTextureCount(); ++i)
+  {
+      ReleaseTexture(Sample.Textures[i]);
+  }
 
 
   csmReleaseGlRenderer(Sample.Renderer);

@@ -77,6 +77,11 @@ void csmUpdateGlRenderer(csmGlRenderer* renderer);
 // GL DRAWING //
 // ---------- //
 
+/// Gets the size of texture identifier array.
+/// 
+/// @param  count  Number of texture.
+unsigned int csmGetSizeofTextureArray(int count);
+
 /// Draws a model. The calling thread must have an OpenGL context current.
 ///
 /// @param  renderer  Model renderer.

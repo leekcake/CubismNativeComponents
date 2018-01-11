@@ -252,6 +252,12 @@ static void SetGlState(DrawContext* context, const csmRenderDrawable* renderDraw
 // IMPLEMENTATION //
 // -------------- //
 
+unsigned int csmGetSizeofTextureArray(int count)
+{
+  return count * sizeof(GLuint);
+}
+
+
 void csmGlDraw(csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textures)
 {
   const RenderDrawable* renderDrawable;
