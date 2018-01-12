@@ -224,6 +224,7 @@ void OnTick(float deltaTime)
                            Sample.Model,
                            Sample.Table,
                            0,
+                           0,
                            0);
   
   // Update animtion userdata callback.

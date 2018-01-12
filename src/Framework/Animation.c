@@ -139,7 +139,8 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
                               csmModel* model,
                               const csmModelHashTable* table,
                               csmModelAnimationCurveHandler handleModelCurve,
-                              void* userData)
+                              void* userData,
+                              void* animationUserData)
 {
   float* parameterValues, * partOpacities;
   const float* parameterDefaultValues;
@@ -216,7 +217,7 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
     value = EvaluateCurve(animation, c , time);
 
     
-    parameterValues[p] = blend(parameterValues[p], value, EvaluateCurve(animation, c, 0.0f), weight);
+    parameterValues[p] = blend(parameterValues[p], value, EvaluateCurve(animation, c, 0.0f), weight, animationUserData);
   }
 
 
@@ -244,6 +245,6 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
     value = EvaluateCurve(animation, c , time);
 
     
-    partOpacities[p] = blend(partOpacities[p], value, EvaluateCurve(animation, c, 0.0f), weight);
+    partOpacities[p] = blend(partOpacities[p], value, EvaluateCurve(animation, c, 0.0f), weight, animationUserData);
   }
 }

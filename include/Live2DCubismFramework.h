@@ -58,19 +58,20 @@ csmModelHashTable;
 
 /// Float blend function.
 ///
-/// @param  base    Current value.
-/// @param  value   Value to blend in.
-/// @param  weight  Blend weight to use.
+/// @param  base      Current value.
+/// @param  value     Value to blend in.
+/// @param  weight    Blend weight to use.
+/// @param  userData  Optional user data.
 ///
 /// @return Blend result.
-typedef float (*csmFloatBlendFunction)(float base, float value, float firstFrameValue, float weight);
+typedef float (*csmFloatBlendFunction)(float base, float value, float firstFrameValue, float weight, void* userData);
 
 
 /// Builtin override float blend function.
-float csmOverrideFloatBlendFunction(float base, float value, float firstFrameValue, float weight);
+float csmOverrideFloatBlendFunction(float base, float value, float firstFrameValue, float weight, void* userData);
 
 /// Builtin additive float blend function.
-float csmAdditiveFloatBlendFunction(float base, float value, float firstFrameValue, float weight);
+float csmAdditiveFloatBlendFunction(float base, float value, float firstFrameValue, float weight, void* userData);
 
 
 /// Opaque Cubism animation.
@@ -305,6 +306,7 @@ csmAnimation *csmDeserializeAnimationInPlace(const char *motionJson, void* addre
 /// @param  table             Model table to user for look-ups.
 /// @param  handleModelCurve  [Optional] Model curve handler.
 /// @param  userData          [Optional] Data to pass to model curve handler.
+/// @param  animationUserData [Optional] Data to pass to animation blending function.
 void csmEvaluateAnimationFAST(const csmAnimation *animation,
                               const csmAnimationState *state,
                               const csmFloatBlendFunction blend,
@@ -312,7 +314,8 @@ void csmEvaluateAnimationFAST(const csmAnimation *animation,
                               csmModel* model,
                               const csmModelHashTable* table,
                               csmModelAnimationCurveHandler handleModelCurve,
-                              void* userData);
+                              void* userData,
+                              void* animationUserData);
 
 // ------- //
 // PHYSICS //

@@ -13,12 +13,12 @@
 // IMPLEMENTATION //
 // -------------- //
 
-float csmOverrideFloatBlendFunction(float base, float value, float firstFrameValue, float weight)
+float csmOverrideFloatBlendFunction(float base, float value, float firstFrameValue, float weight, void* userData)
 {
   return (value  * weight) + (base * (1.0f - weight));
 }
 
-float csmAdditiveFloatBlendFunction(float base, float value, float firstFrameValue, float weight)
+float csmAdditiveFloatBlendFunction(float base, float value, float firstFrameValue, float weight, void* userData)
 {
   return base + ((value - firstFrameValue) * weight);
 }
