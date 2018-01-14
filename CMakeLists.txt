@@ -90,8 +90,10 @@ if (NOT EXISTS "${_CSM_COMPONENTS_CORE_INCLUDE_DIR}/Live2DCubismCore.h")
 endif ()
 
 # Make sure OpenGL header is valid if required.
-if (_CSM_COMPONENTS_GL_H AND (NOT EXISTS ${_CSM_COMPONENTS_GL_H} OR IS_DIRECTORY ${_CSM_COMPONENTS_GL_H}))
-  message(FATAL_ERROR "[Live2D Cubism Components] OpenGL header not found.")
+if(DEFINED _CSM_COMPONENTS_GL_H)
+	if ((NOT EXISTS ${_CSM_COMPONENTS_GL_H} OR IS_DIRECTORY ${_CSM_COMPONENTS_GL_H}))
+	  message(FATAL_ERROR "[Live2D Cubism Components] OpenGL header not found.")
+	endif ()
 endif ()
 
 
