@@ -6,6 +6,7 @@
  */
  
  
+#include <Live2DCubismCore.h>
  #include "Local.h"
 
  #include <stdlib.h>
@@ -225,6 +226,20 @@ static const GLint VertexPositionLocation = 0;
 /// Location of vertex UV.
 static const GLint VertexUvLocation = 1;
 
+static void CheckShaderCompile(GLuint shader) {
+	GLint success = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+	if (success == GL_FALSE) {
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		GLchar* log = malloc(sizeof(GLchar) * maxLength + 1);
+		glGetShaderInfoLog(shader, maxLength, &maxLength, log);
+		csmGetLogFunction()(log);
+	}
+}
 
 // --------- //
 // FUNCTIONS //
@@ -248,6 +263,7 @@ static Program MakeProgram(const GLchar* vertexShaderString, const GLchar* fragm
 
   glShaderSource(vertexShader, 1, &vertexShaderString, 0);
   glCompileShader(vertexShader);
+  CheckShaderCompile(vertexShader);
 
 
   // Make fragment shader.
@@ -256,7 +272,7 @@ static Program MakeProgram(const GLchar* vertexShaderString, const GLchar* fragm
 
   glShaderSource(fragmentShader, 1, &fragmentShaderString, 0);
   glCompileShader(fragmentShader);
-
+  CheckShaderCompile(fragmentShader);
 
   // Create program and attach shaders.
   program.Handle = glCreateProgram();
