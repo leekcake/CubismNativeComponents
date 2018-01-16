@@ -5,8 +5,6 @@
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
  
- 
-#include <Live2DCubismCore.h>
 #include <Live2DCubismGlRenderingINTERNAL.h>
  #include "Local.h"
 
@@ -56,26 +54,21 @@ static const GLchar GL30VertexShaderCode[] =
 #else
 "#version 300 es\n"
 #endif
-
+"precision highp float;"
 "in vec2 VertexPosition;"
 "in vec2 VertexUv;"
 
-
-"out vec4 Color;"
 "out vec2 MaskUv;"
 "out vec2 DiffuseUv;"
 
-
 "uniform mat4 Mvp;"
-"uniform float Opacity;"
-
 
 "void main()"
 "{"
 "  vec4 position = Mvp * vec4(VertexPosition, 0.0, 1.0);"
 
 
-"  vec4 screenPosition = position * 0.5;"
+"  highp vec4 screenPosition = position * 0.5;"
 
 
 "  screenPosition.xy = screenPosition.xy + screenPosition.w;"
@@ -84,46 +77,9 @@ static const GLchar GL30VertexShaderCode[] =
 
 "  gl_Position = position;"
 
-
-"  Color = vec4(1, 1, 1, Opacity);"
 "  MaskUv = screenPosition.xy;"
 "  DiffuseUv = VertexUv;"
 "}";
-
-static const GLchar GL20VertexShaderCode[] =
-"attribute vec2 VertexPosition;"
-"attribute vec2 VertexUv;"
-
-
-"varying vec4 Color;"
-"varying vec2 MaskUv;"
-"varying vec2 DiffuseUv;"
-
-
-"uniform mat4 Mvp;"
-"uniform float Opacity;"
-
-
-"void main()"
-"{"
-"  vec4 position = Mvp * vec4(VertexPosition, 0.0, 1.0);"
-
-
-"  vec4 screenPosition = position * 0.5;"
-
-
-"  screenPosition.xy = screenPosition.xy + screenPosition.w;"
-"  screenPosition.zw = position.zw;"
-
-
-"  gl_Position = position;"
-
-
-"  Color = vec4(1, 1, 1, Opacity);"
-"  MaskUv = screenPosition.xy;"
-"  DiffuseUv = VertexUv;"
-"}";
-
 
 /// Non-masked fragment shader code.
 static const GLchar GL30NonMaskedFragmentShaderCode[] =
@@ -134,10 +90,38 @@ static const GLchar GL30NonMaskedFragmentShaderCode[] =
 #endif
 "precision mediump float;"
 
-"in vec4 Color;"
-"in vec2 DiffuseUv;"
+"in highp vec2 DiffuseUv;"
+
+"uniform float Opacity;"
+"uniform sampler2D DiffuseTexture;"
+
+"out vec4 FragColor;"
 
 
+"void main()"
+"{"
+"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * vec4(1, 1, 1, Opacity);"
+
+
+"  fragColor.rbg *= fragColor.a;"
+
+
+"  FragColor = fragColor;"
+"}";
+
+/// Masked fragment shader code.
+static const GLchar GL30MaskedFragmentShaderCode[] =
+#ifdef _CSM_COMPONENTS_DESKTOP
+"#version 330\n"
+#else
+"#version 300 es\n"
+#endif
+"precision mediump float;"
+"in highp vec2 MaskUv;"
+"in highp vec2 DiffuseUv;"
+
+"uniform float Opacity;"
+"uniform sampler2D MaskTexture;"
 "uniform sampler2D DiffuseTexture;"
 
 
@@ -146,14 +130,46 @@ static const GLchar GL30NonMaskedFragmentShaderCode[] =
 
 "void main()"
 "{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
+"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * vec4(1, 1, 1, Opacity);"
 
 
+"  fragColor.a *= texture(MaskTexture, MaskUv).a;"
 "  fragColor.rbg *= fragColor.a;"
 
 
 "  FragColor = fragColor;"
 "}";
+
+//OpenGL 2 Support Layer
+
+static const GLchar GL20VertexShaderCode[] =
+"attribute vec2 VertexPosition;"
+"attribute vec2 VertexUv;"
+
+"varying vec4 Color;"
+"varying vec2 MaskUv;"
+"varying vec2 DiffuseUv;"
+
+"uniform mat4 Mvp;"
+
+"void main()"
+"{"
+"  vec4 position = Mvp * vec4(VertexPosition, 0.0, 1.0);"
+
+
+"  vec4 screenPosition = position * 0.5;"
+
+
+"  screenPosition.xy = screenPosition.xy + screenPosition.w;"
+"  screenPosition.zw = position.zw;"
+
+
+"  gl_Position = position;"
+
+"  MaskUv = screenPosition.xy;"
+"  DiffuseUv = VertexUv;"
+"}";
+
 static const GLchar GL20NonMaskedFragmentShaderCode[] =
 "precision mediump float;"
 "varying mediump vec4 Color;"
@@ -174,38 +190,6 @@ static const GLchar GL20NonMaskedFragmentShaderCode[] =
 "  gl_FragColor = fragColor;"
 "}";
 
-
-/// Masked fragment shader code.
-static const GLchar GL30MaskedFragmentShaderCode[] =
-#ifdef _CSM_COMPONENTS_DESKTOP
-"#version 330\n"
-#else
-"#version 300 es\n"
-#endif
-"precision mediump float;"
-"in vec4 Color;"
-"in vec2 MaskUv;"
-"in vec2 DiffuseUv;"
-
-
-"uniform sampler2D MaskTexture;"
-"uniform sampler2D DiffuseTexture;"
-
-
-"out vec4 FragColor;"
-
-
-"void main()"
-"{"
-"  vec4 fragColor = texture(DiffuseTexture, DiffuseUv) * Color;"
-
-
-"  fragColor.a *= texture(MaskTexture, MaskUv).a;"
-"  fragColor.rbg *= fragColor.a;"
-
-
-"  FragColor = fragColor;"
-"}";
 static const GLchar GL20MaskedFragmentShaderCode[] =
 "precision mediump float;"
 "varying mediump vec4 Color;"
