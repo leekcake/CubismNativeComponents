@@ -10,6 +10,9 @@
 
 #include <stdio.h>
 
+#ifdef _YES_DEBUG_TIME
+#include <Live2DCubismCore.h>
+#endif
 
 // ----- //
 // TYPES //
@@ -77,13 +80,30 @@ static Maskbuffer MakeMaskbuffer(const GLint size)
   glGetIntegerv(GL_RENDERBUFFER_BINDING, &userRenderBuffer);
   glBindRenderbuffer(GL_RENDERBUFFER, buffer.DepthAttachment);
 
-
-#if _CSM_COMPONENTS_IOS
+  glGetError();
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size, size);
-#else
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size, size);
-#endif
 
+#ifdef _YES_DEBUG_TIME
+	switch (glGetError()) {
+	case 0:
+		break;
+	case GL_INVALID_ENUM:
+		csmGetLogFunction()("Render Buffer Creation Failed because invalid enum");
+		break;
+	case GL_INVALID_OPERATION:
+		csmGetLogFunction()("Render Buffer Creation Failed because invalid operation");
+		break;
+	case GL_INVALID_VALUE:
+		csmGetLogFunction()("Render Buffer Creation Failed because invalid value");
+		break;
+	case GL_OUT_OF_MEMORY:
+		csmGetLogFunction()("Render Buffer Creation Failed because out of memory(!?)");
+		break;
+	default:
+		csmGetLogFunction()("Render Buffer Creation Failed without known issue?!");
+		break;
+	}
+#endif
 
   glBindRenderbuffer(GL_RENDERBUFFER, userRenderBuffer);
 
@@ -97,8 +117,42 @@ static Maskbuffer MakeMaskbuffer(const GLint size)
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.Texture, 0);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.DepthAttachment); 
-
-
+#ifdef _YES_DEBUG_TIME
+  GLint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status == GL_FRAMEBUFFER_COMPLETE) {
+	  csmGetLogFunction()("Mask Buffer Creation Complete!");
+  }
+  else {
+	  csmGetLogFunction()("Mask Buffer Creation Failed?!");
+	  switch (status) {
+	  case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+		  csmGetLogFunction()("Because Attachment?");
+		  break;
+		  /*
+	  case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+		  csmGetLogFunction()("Because Draw Buffer?");
+		  break;
+	  case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+		  csmGetLogFunction()("Because Layer Target?");
+		  break;
+		  */
+	  case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+		  csmGetLogFunction()("Because Missing Attachment?");
+		  break;
+	  case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+		  csmGetLogFunction()("Because Multisample?");
+		  break;
+		  /*
+	  case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+		  csmGetLogFunction()("Because Read Buffer?");
+		  break;
+		  */
+	  default:
+		  csmGetLogFunction()("Because Unknown Leason!?!?");
+		  break;
+	  }
+  }
+#endif
    glBindFramebuffer(GL_FRAMEBUFFER, userFramebuffer);
 
 
