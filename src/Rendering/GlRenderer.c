@@ -159,7 +159,6 @@ static void InitializeBuffers(csmGlRenderer* renderer)
 /// @param  renderer                         Renderer to initialize.
 /// @param  vertexPositionAttributeLocation  Attribute location for the vertex positions.
 /// @param  vertexUvAttributeLocation        Attribute location for the vertex uvs.
-#if _CSM_COMPONENTS_USE_GL33
 static void InitializeVertexArray(csmGlRenderer* renderer,
                                   const GLint vertexPositionAttributeLocation,
                                   const GLint vertexUvAttributeLocation)
@@ -189,7 +188,6 @@ static void InitializeVertexArray(csmGlRenderer* renderer,
   UnbindGlBuffer(&renderer->Buffers.Uvs);
   UnbindGlBuffer(&renderer->Buffers.Indices);
 }
-#endif
 
 
 // -------------- //
@@ -270,11 +268,9 @@ csmGlRenderer* csmMakeBareboneGlRendererInPlace(const csmModel* model,
 
   // Initialize OpenGL resources and related drawables.
   InitializeBuffers(renderer);
-#if _CSM_COMPONENTS_USE_GL33
-  InitializeVertexArray(renderer, GetGlVertexPositionLocation(), GetGlVertexUvLocation());
-#endif
-
-
+  if (csmIsSupportGL30()) {
+	  InitializeVertexArray(renderer, GetGlVertexPositionLocation(), GetGlVertexUvLocation());
+  }
 	// Finalize initialization by calling update once.
 	csmUpdateGlRenderer(renderer);
 

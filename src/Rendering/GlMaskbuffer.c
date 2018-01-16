@@ -143,9 +143,9 @@ void RequireGlMaskbuffer()
   // Initialize singleton.
   if (!RetainSingleton)
   {
-#if _CSM_COMPONENTS_USE_GL33
+#if _CSM_COMPONENTS_DESKTOP
     Singleton = MakeMaskbuffer(2048);
-#elif _CSM_COMPONENTS_USE_GLES20
+#else
     Singleton = MakeMaskbuffer(1024);
 #endif
   }

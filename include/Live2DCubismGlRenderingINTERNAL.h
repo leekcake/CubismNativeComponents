@@ -8,6 +8,25 @@
 
 #pragma once
 
+#if _CSM_COMPONENTS_DESKTOP
+#include _CSM_COMPONENTS_GL_H
+
+#else
+#if _CSM_COMPONENTS_IOS
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+
+#else
+#include <GLES2/gl2.h>
+
+#endif
+
+#if _CSM_COMPONENTS_ANDROID
+#include <gl3stub.h>
+#endif
+#endif
+
+#include <Live2DCubismCore.h>
 
 // -------- //
 // REQUIRES //
@@ -191,6 +210,12 @@ static inline GLvoid* csmGetRenderDrawableGlIndicesOffset(const csmRenderDrawabl
 {
   return (GLvoid*)(sizeof(GLushort) * drawable->Indices.BaseIndex);
 }
+
+///Check This device is supporting OpenGL 3 or above
+///This method must called before use any OpenGL 3.0 related method on Android
+///
+///@return 1 on support; 0 otherwise.
+char csmIsSupportGL30();
 
 
 // ----------- //

@@ -7,6 +7,7 @@
  
  
 #include <Live2DCubismCore.h>
+#include <Live2DCubismGlRenderingINTERNAL.h>
  #include "Local.h"
 
  #include <stdlib.h>
@@ -49,10 +50,12 @@ Program;
 // ----------------- //
 
 /// Vertex shader code.
-static const GLchar VertexShaderCode[] =
-#if _CSM_COMPONENTS_USE_GL33
+static const GLchar GL30VertexShaderCode[] =
+#ifdef _CSM_COMPONENTS_DESKTOP
 "#version 330\n"
-
+#else
+"#version 300 es\n"
+#endif
 
 "in vec2 VertexPosition;"
 "in vec2 VertexUv;"
@@ -86,7 +89,8 @@ static const GLchar VertexShaderCode[] =
 "  MaskUv = screenPosition.xy;"
 "  DiffuseUv = VertexUv;"
 "}";
-#elif _CSM_COMPONENTS_USE_GLES20
+
+static const GLchar GL20VertexShaderCode[] =
 "attribute vec2 VertexPosition;"
 "attribute vec2 VertexUv;"
 
@@ -119,14 +123,16 @@ static const GLchar VertexShaderCode[] =
 "  MaskUv = screenPosition.xy;"
 "  DiffuseUv = VertexUv;"
 "}";
-#endif
 
 
 /// Non-masked fragment shader code.
-static const GLchar NonMaskedFragmentShaderCode[] =
-#if _CSM_COMPONENTS_USE_GL33
+static const GLchar GL30NonMaskedFragmentShaderCode[] =
+#ifdef _CSM_COMPONENTS_DESKTOP
 "#version 330\n"
-
+#else
+"#version 300 es\n"
+#endif
+"precision mediump float;"
 
 "in vec4 Color;"
 "in vec2 DiffuseUv;"
@@ -148,7 +154,8 @@ static const GLchar NonMaskedFragmentShaderCode[] =
 
 "  FragColor = fragColor;"
 "}";
-#elif _CSM_COMPONENTS_USE_GLES20
+static const GLchar GL20NonMaskedFragmentShaderCode[] =
+"precision mediump float;"
 "varying mediump vec4 Color;"
 "varying mediump vec2 DiffuseUv;"
 
@@ -166,13 +173,16 @@ static const GLchar NonMaskedFragmentShaderCode[] =
 
 "  gl_FragColor = fragColor;"
 "}";
-#endif
 
 
 /// Masked fragment shader code.
-static const GLchar MaskedFragmentShaderCode[] =
-#if _CSM_COMPONENTS_USE_GL33
+static const GLchar GL30MaskedFragmentShaderCode[] =
+#ifdef _CSM_COMPONENTS_DESKTOP
 "#version 330\n"
+#else
+"#version 300 es\n"
+#endif
+"precision mediump float;"
 "in vec4 Color;"
 "in vec2 MaskUv;"
 "in vec2 DiffuseUv;"
@@ -196,11 +206,11 @@ static const GLchar MaskedFragmentShaderCode[] =
 
 "  FragColor = fragColor;"
 "}";
-#elif _CSM_COMPONENTS_USE_GLES20
+static const GLchar GL20MaskedFragmentShaderCode[] =
+"precision mediump float;"
 "varying mediump vec4 Color;"
 "varying mediump vec2 MaskUv;"
 "varying mediump vec2 DiffuseUv;"
-
 
 "uniform sampler2D MaskTexture;"
 "uniform sampler2D DiffuseTexture;"
@@ -217,7 +227,6 @@ static const GLchar MaskedFragmentShaderCode[] =
 
 "  gl_FragColor = fragColor;"
 "}";
-#endif
 
 
 /// Location of vertex position.
@@ -343,8 +352,15 @@ void RequireGlPrograms()
   // Initialize programs if necessary.
   if (!RetainPrograms)
   {
-    Programs[0] = MakeProgram(VertexShaderCode, NonMaskedFragmentShaderCode);
-    Programs[1] = MakeProgram(VertexShaderCode, MaskedFragmentShaderCode);
+	  if (csmIsSupportGL30()) {
+		  Programs[0] = MakeProgram(GL30VertexShaderCode, GL30NonMaskedFragmentShaderCode);
+		  Programs[1] = MakeProgram(GL30VertexShaderCode, GL30MaskedFragmentShaderCode);
+	  }
+	  else
+	  {
+		  Programs[0] = MakeProgram(GL20VertexShaderCode, GL20NonMaskedFragmentShaderCode);
+		  Programs[1] = MakeProgram(GL20VertexShaderCode, GL20MaskedFragmentShaderCode);
+	  }
   }
 
 

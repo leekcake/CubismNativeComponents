@@ -13,15 +13,22 @@
 // REQUIRES //
 // -------- //
 
-#if _CSM_COMPONENTS_USE_GL33
-  #include _CSM_COMPONENTS_GL_H
-#elif _CSM_COMPONENTS_USE_GLES20
-  #if _CSM_COMPONENTS_IOS
-    #include <OpenGLES/ES2/gl.h>
-    #include <OpenGLES/ES2/glext.h>
-  #else
-    #include <GLES2/gl2.h>
-  #endif
+#if _CSM_COMPONENTS_DESKTOP
+ #include _CSM_COMPONENTS_GL_H
+
+#else
+#if _CSM_COMPONENTS_IOS
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+
+#else
+#include <GLES2/gl2.h>
+
+#endif
+
+#if _CSM_COMPONENTS_ANDROID
+#include <gl3stub.h>
+#endif
 #endif
 
 

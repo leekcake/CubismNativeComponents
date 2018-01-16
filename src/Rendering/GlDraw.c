@@ -277,24 +277,26 @@ void csmGlDraw(csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textur
 
 
   // Bind geometry.
-#if _CSM_COMPONENTS_USE_GL33
-  glBindVertexArray(renderer->VertexArray);
-#elif _CSM_COMPONENTS_USE_GLES20
-  BindGlBuffer(&renderer->Buffers.Positions);
-  glVertexAttribPointer(GetGlVertexPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+  char supportGL30 = csmIsSupportGL30();
+  if (supportGL30) {
+	  glBindVertexArray(renderer->VertexArray);
+  }
+  else
+  {
+	  BindGlBuffer(&renderer->Buffers.Positions);
+	  glVertexAttribPointer(GetGlVertexPositionLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-  BindGlBuffer(&renderer->Buffers.Uvs);
-  glVertexAttribPointer(GetGlVertexUvLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+	  BindGlBuffer(&renderer->Buffers.Uvs);
+	  glVertexAttribPointer(GetGlVertexUvLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
+	  glEnableVertexAttribArray(0);
+	  glEnableVertexAttribArray(1);
 
 
-  BindGlBuffer(&renderer->Buffers.Indices);
-#endif
-
+	  BindGlBuffer(&renderer->Buffers.Indices);
+  }
 
   // Draw.
   for (d = 0; d < renderer->DrawableCount; ++d)
@@ -323,10 +325,12 @@ void csmGlDraw(csmGlRenderer* renderer, const GLfloat* mvp, const GLuint* textur
 
 
   // Unbind geometry.
-#if _CSM_COMPONENTS_USE_GL33
-  glBindVertexArray(0);
-#elif _CSM_COMPONENTS_USE_GLES20
-  UnbindGlBuffer(&renderer->Buffers.Uvs);
-  UnbindGlBuffer(&renderer->Buffers.Indices);
-#endif
+  if (supportGL30) {
+	  glBindVertexArray(0);
+  }
+  else
+  {
+	  UnbindGlBuffer(&renderer->Buffers.Uvs);
+	  UnbindGlBuffer(&renderer->Buffers.Indices);
+  }
 }
